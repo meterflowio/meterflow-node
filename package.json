@@ -1,0 +1,60 @@
+{
+  "name": "meterflow",
+  "version": "0.1.0",
+  "description": "Official Node.js SDK for MeterFlow — usage-based billing, credit management, and metering.",
+  "license": "MIT",
+  "author": "MeterFlow",
+  "homepage": "https://github.com/meterflowio/meterflow-node",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meterflowio/meterflow-node.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.json --emitDeclarationOnly && node scripts/build-fix.mjs && esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/index.mjs && esbuild src/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs && node -e \"require('fs').copyFileSync('dist/index.cjs','dist/index.js')\"",
+    "dev": "tsc --project tsconfig.json --watch",
+    "quickstart": "npm run build && npx tsx examples/quickstart.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "format": "prettier --write src tests",
+    "format:check": "prettier --check src tests",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "generate:types": "openapi-typescript ../../docs/openapi.json -o src/types/openapi.d.ts",
+    "ci:types-check": "npm run generate:types && git diff --exit-code src/types/openapi.d.ts"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "esbuild": "^0.25.0",
+    "@types/node": "^18.19.130",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "eslint": "^8.57.0",
+    "msw": "^2.3.0",
+    "openapi-typescript": "^7.0.0",
+    "prettier": "^3.3.0",
+    "rollup": "^4.18.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0"
+  }
+}

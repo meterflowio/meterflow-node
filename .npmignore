@@ -1,0 +1,10 @@
+src/
+tests/
+examples/
+*.config.js
+*.config.ts
+.eslintrc.json
+.prettierrc.json
+tsconfig.json
+rollup.config.js
+vitest.config.ts
