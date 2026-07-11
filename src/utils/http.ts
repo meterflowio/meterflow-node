@@ -11,7 +11,7 @@ import {
 } from "../errors";
 import { retryable } from "./retry";
 
-const SDK_VERSION = "0.1.0";
+const SDK_VERSION = "0.2.0";
 
 function buildUrl(baseUrl: string, path: string, query?: Record<string, string | number | boolean>): string {
   const url = new URL(path, baseUrl.endsWith("/") ? baseUrl : baseUrl + "/");

@@ -1,6 +1,6 @@
 {
   "name": "meterflow",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Official Node.js SDK for MeterFlow — usage-based billing, credit management, and metering.",
   "license": "MIT",
   "author": "MeterFlow",
@@ -17,16 +17,22 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
+    },
+    "./webhook": {
+      "types": "./dist/webhook.d.ts",
+      "import": "./dist/webhook.mjs",
+      "require": "./dist/webhook.cjs"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc --project tsconfig.json --emitDeclarationOnly && node scripts/build-fix.mjs && esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/index.mjs && esbuild src/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs && node -e \"require('fs').copyFileSync('dist/index.cjs','dist/index.js')\"",
+    "prepublishOnly": "npm run build",
+    "build": "tsc --project tsconfig.json --emitDeclarationOnly && node scripts/build-fix.mjs && esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/index.mjs && esbuild src/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs && esbuild src/webhook.ts --bundle --platform=node --format=esm --outfile=dist/webhook.mjs && esbuild src/webhook.ts --bundle --platform=node --format=cjs --outfile=dist/webhook.cjs && node -e \"require('fs').copyFileSync('dist/index.cjs','dist/index.js')\"",
     "dev": "tsc --project tsconfig.json --watch",
     "quickstart": "npm run build && npx tsx examples/quickstart.ts",
     "typecheck": "tsc --noEmit",

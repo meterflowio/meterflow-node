@@ -61,7 +61,7 @@ const client = new MeterFlow({
 ## Webhook verification
 
 ```typescript
-import { verifyWebhook } from "meterflow";
+import { verifyWebhook } from "meterflow/webhook";
 
 const isValid = verifyWebhook(rawBody, req.headers["x-meterflow-signature"], webhookSecret);
 ```

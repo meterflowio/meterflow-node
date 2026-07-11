@@ -23,7 +23,8 @@
  *
  */
 
-import { MeterFlow, verifyWebhook } from "../dist/index";
+import { MeterFlow } from "../dist/index";
+import { verifyWebhook } from "../dist/webhook";
 import { createHmac } from "crypto";
 
 const apiKey = process.env["METERFLOW_API_KEY"];

@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   MeterFlow,
-  verifyWebhook,
   MeterFlowError,
   AuthError,
   NotFoundError,
@@ -16,11 +15,6 @@ describe("public index exports", () => {
   it("exports MeterFlow client class", () => {
     expect(MeterFlow).toBeDefined();
     expect(new MeterFlow({ apiKey: "mf_test_x" })).toBeInstanceOf(MeterFlow);
-  });
-
-  it("exports verifyWebhook", () => {
-    expect(verifyWebhook).toBeDefined();
-    expect(typeof verifyWebhook).toBe("function");
   });
 
   it("exports all error classes", () => {

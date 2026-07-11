@@ -48,3 +48,23 @@ describe("MeterFlow client constructor", () => {
     expect(client.plans).toBeDefined();
   });
 });
+
+describe("browser compatibility", () => {
+  it("calls the default global fetch bound to globalThis (guards the browser 'Illegal invocation' bug)", async () => {
+    const realFetch = globalThis.fetch;
+    // Browsers require window.fetch to run with `this === window`. Node's fetch tolerates any `this`,
+    // so a binding regression would pass in Node/MSW and only break in the browser — emulate the
+    // browser's strictness here so the default-fetch binding is actually covered.
+    const strictFetch = function (this: unknown): Promise<Response> {
+      if (this !== globalThis) throw new TypeError("Illegal invocation");
+      return Promise.resolve(new Response("[]", { status: 200, headers: { "content-type": "application/json" } }));
+    };
+    globalThis.fetch = strictFetch as unknown as typeof globalThis.fetch;
+    try {
+      const client = new MeterFlow({ apiKey: "mf_test_x", baseUrl: "http://localhost/api/v1" });
+      await expect(client.plans.list()).resolves.toEqual([]);
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+});

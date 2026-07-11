@@ -36,7 +36,9 @@ export class MeterFlow {
       baseUrl: options.baseUrl ?? "https://api.meterflow.com/api/v1",
       timeout: options.timeout ?? 30_000,
       retries: options.retries ?? 3,
-      fetch: options.fetch ?? globalThis.fetch,
+      // Bind to globalThis: browsers throw "Illegal invocation" if window.fetch is
+      // called detached from window (Node tolerates it, so this only bites in the browser).
+      fetch: options.fetch ?? globalThis.fetch.bind(globalThis),
     };
   }
 

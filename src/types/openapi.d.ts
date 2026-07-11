@@ -4,518 +4,6 @@
  */
 
 export interface paths {
-    "/api/v1/analytics/revenue": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Revenue analytics — credits granted/deducted over time, plus subscription status counts */
-        get: operations["revenue_analytics_api_v1_analytics_revenue_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/analytics/usage": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Usage analytics — event counts and values over time, bucketed by granularity */
-        get: operations["usage_analytics_api_v1_analytics_usage_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/api-keys/{key_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Revoke API key */
-        delete: operations["revoke_api_v1_api_keys__key_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Login and receive a JWT access token */
-        post: operations["login_api_v1_auth_login_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** refresh JWT access token */
-        post: operations["refresh_api_v1_auth_refresh_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/registration": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Register a new user and organization */
-        post: operations["registration_api_v1_auth_registration_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/credits/deduct": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Deduct credits from a customer */
-        post: operations["deduct_api_v1_credits_deduct_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/credits/grant": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Grant credits to a customer */
-        post: operations["grant_api_v1_credits_grant_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/credits/{customer_id}/balance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get credit balance for a customer */
-        get: operations["balance_api_v1_credits__customer_id__balance_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/credits/{customer_id}/transactions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List credit transactions for a customer */
-        get: operations["transactions_api_v1_credits__customer_id__transactions_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/meters": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List meters */
-        get: operations["list_all_api_v1_meters_get"];
-        put?: never;
-        /** Create meter */
-        post: operations["create_api_v1_meters_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/meters/{meter_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get meter */
-        get: operations["get_one_api_v1_meters__meter_id__get"];
-        put?: never;
-        post?: never;
-        /** Delete meter */
-        delete: operations["delete_api_v1_meters__meter_id__delete"];
-        options?: never;
-        head?: never;
-        /** Update meter */
-        patch: operations["update_api_v1_meters__meter_id__patch"];
-        trace?: never;
-    };
-    "/api/v1/organizations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List user's organizations */
-        get: operations["list_orgs_api_v1_organizations_get"];
-        put?: never;
-        /** Create organization */
-        post: operations["create_api_v1_organizations_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/organizations/{org_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get organization */
-        get: operations["get_org_api_v1_organizations__org_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Update organization */
-        patch: operations["update_org_api_v1_organizations__org_id__patch"];
-        trace?: never;
-    };
-    "/api/v1/organizations/{org_id}/members": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Invite member */
-        post: operations["invite_api_v1_organizations__org_id__members_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/organizations/{org_id}/projects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List projects */
-        get: operations["list_projs_api_v1_organizations__org_id__projects_get"];
-        put?: never;
-        /** Create project */
-        post: operations["create_api_v1_organizations__org_id__projects_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/organizations/{org_id}/projects/{project_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get project */
-        get: operations["get_proj_api_v1_organizations__org_id__projects__project_id__get"];
-        put?: never;
-        post?: never;
-        /** Deactivate project */
-        delete: operations["delete_proj_api_v1_organizations__org_id__projects__project_id__delete"];
-        options?: never;
-        head?: never;
-        /** Update project */
-        patch: operations["update_proj_api_v1_organizations__org_id__projects__project_id__patch"];
-        trace?: never;
-    };
-    "/api/v1/organizations/{org_id}/projects/{project_id}/api-keys": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List API keys */
-        get: operations["list_keys_api_v1_organizations__org_id__projects__project_id__api_keys_get"];
-        put?: never;
-        /** Generate API key */
-        post: operations["create_api_v1_organizations__org_id__projects__project_id__api_keys_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/plans": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List plans */
-        get: operations["list_all_api_v1_plans_get"];
-        put?: never;
-        /** Create plan */
-        post: operations["create_api_v1_plans_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/plans/{plan_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get plan */
-        get: operations["get_one_api_v1_plans__plan_id__get"];
-        put?: never;
-        post?: never;
-        /** Delete plan */
-        delete: operations["delete_api_v1_plans__plan_id__delete"];
-        options?: never;
-        head?: never;
-        /** Update plan */
-        patch: operations["update_api_v1_plans__plan_id__patch"];
-        trace?: never;
-    };
-    "/api/v1/subscriptions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List subscriptions */
-        get: operations["list_all_api_v1_subscriptions_get"];
-        put?: never;
-        /** Create subscription */
-        post: operations["create_api_v1_subscriptions_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/subscriptions/{subscription_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get subscription */
-        get: operations["get_one_api_v1_subscriptions__subscription_id__get"];
-        put?: never;
-        post?: never;
-        /** Delete subscription */
-        delete: operations["delete_api_v1_subscriptions__subscription_id__delete"];
-        options?: never;
-        head?: never;
-        /** Update subscription */
-        patch: operations["update_api_v1_subscriptions__subscription_id__patch"];
-        trace?: never;
-    };
-    "/api/v1/usage/events": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Record a usage event */
-        post: operations["create_event_api_v1_usage_events_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/usage/events/batch": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Record usage events in batch */
-        post: operations["create_batch_api_v1_usage_events_batch_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/usage/{customer_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get usage summary for a customer */
-        get: operations["summary_api_v1_usage__customer_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get current authenticated user */
-        get: operations["get_me_api_v1_users_me_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Update current authenticated user */
-        patch: operations["patch_me_api_v1_users_me_patch"];
-        trace?: never;
-    };
-    "/api/v1/webhooks": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List webhooks for a project */
-        get: operations["get_webhooks_api_v1_webhooks_get"];
-        put?: never;
-        /** Register a webhook for a project */
-        post: operations["register_webhook_api_v1_webhooks_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/webhooks/{webhook_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a webhook by ID */
-        get: operations["get_webhook_by_id_api_v1_webhooks__webhook_id__get"];
-        put?: never;
-        post?: never;
-        /** Delete a webhook */
-        delete: operations["remove_webhook_api_v1_webhooks__webhook_id__delete"];
-        options?: never;
-        head?: never;
-        /** Update a webhook */
-        patch: operations["patch_webhook_api_v1_webhooks__webhook_id__patch"];
-        trace?: never;
-    };
-    "/api/v1/webhooks/{webhook_id}/deliveries": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List delivery attempts for a webhook */
-        get: operations["get_deliveries_api_v1_webhooks__webhook_id__deliveries_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/health": {
         parameters: {
             query?: never;
@@ -533,10 +21,765 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/registration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register a new user and organization */
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login and receive a JWT access token */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** refresh JWT access token */
+        post: operations["refreshToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/password-reset/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Request a password reset token */
+        post: operations["requestPasswordReset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/password-reset/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset password using a reset token */
+        post: operations["confirmPasswordReset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/verify-email/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Request an email verification link */
+        post: operations["requestEmailVerification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/verify-email/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm an email address using a verification token */
+        post: operations["confirmEmailVerification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current authenticated user */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update current authenticated user */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List user's organizations */
+        get: operations["list"];
+        put?: never;
+        /** Create organization */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get organization */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update organization */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invite member */
+        post: operations["invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List projects */
+        get: operations["list"];
+        put?: never;
+        /** Create project */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/projects/{project_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get project */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        /** Deactivate project */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        /** Update project */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/projects/{project_id}/api-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List API keys */
+        get: operations["list"];
+        put?: never;
+        /** Generate API key */
+        post: operations["generate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/projects/{project_id}/api-keys/dashboard-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Issue a dashboard SDK session key
+         * @description Mint (rotating) an ephemeral mf_test_* key so the JWT-authenticated dashboard can drive the
+         *     API-key-only SDK endpoints (credits/usage/subscriptions) for this project.
+         */
+        post: operations["issueDashboardKey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/api-keys/{key_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke API key */
+        delete: operations["revoke"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/meters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List meters */
+        get: operations["list"];
+        put?: never;
+        /** Create meter */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/meters/{meter_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get meter */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        /** Delete meter */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        /** Update meter */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List plans */
+        get: operations["list"];
+        put?: never;
+        /** Create plan */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plans/{plan_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get plan */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        /** Delete plan */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        /** Update plan */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List subscriptions */
+        get: operations["list"];
+        put?: never;
+        /** Create subscription */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subscriptions/{subscription_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get subscription */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        /** Delete subscription */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        /** Update subscription */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/credits/grant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Grant credits to a customer */
+        post: operations["grant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/credits/deduct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Deduct credits from a customer */
+        post: operations["deduct"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/credits/{customer_id}/balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get credit balance for a customer */
+        get: operations["checkBalance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/credits/{customer_id}/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List credit transactions for a customer */
+        get: operations["transactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usage/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record a usage event */
+        post: operations["record"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usage/events/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record usage events in batch */
+        post: operations["recordInBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usage/{customer_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get usage summary for a customer */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/webhooks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List webhooks for a project */
+        get: operations["list"];
+        put?: never;
+        /** Register a webhook for a project */
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/webhooks/{webhook_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a webhook by ID */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        /** Delete a webhook */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        /** Update a webhook */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/webhooks/{webhook_id}/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List delivery attempts for a webhook */
+        get: operations["listDeliveryAttempts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Usage analytics — event counts and values over time, bucketed by granularity */
+        get: operations["usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/revenue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Revenue analytics — credits granted/deducted over time, plus subscription status counts */
+        get: operations["revenue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Platform-wide stats */
+        get: operations["admin_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all organizations (cross-tenant) */
+        get: operations["admin_list_organizations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all projects (cross-tenant) */
+        get: operations["admin_list_projects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all users (cross-tenant) */
+        get: operations["admin_list_users"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AdminOrganizationResponse
+         * @description Organization plus rollup counts — one row per org across the whole platform.
+         */
+        AdminOrganizationResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Billing Email */
+            billing_email: string | null;
+            /** Member Count */
+            member_count: number;
+            /** Project Count */
+            project_count: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * AdminProjectResponse
+         * @description Project row across all organizations.
+         */
+        AdminProjectResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Is Active */
+            is_active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * AdminUserResponse
+         * @description Full user row for the platform-operator console (cross-tenant).
+         */
+        AdminUserResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** First Name */
+            first_name: string | null;
+            /** Last Name */
+            last_name: string | null;
+            /** Email Verified */
+            email_verified: boolean;
+            /** Is Active */
+            is_active: boolean;
+            /** Is Superuser */
+            is_superuser: boolean;
+            /** Last Login At */
+            last_login_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /**
          * AggregationType
          * @enum {string}
@@ -544,69 +787,69 @@ export interface components {
         AggregationType: "count" | "sum" | "max" | "min" | "unique_count";
         /** ApiKeyCreateRequest */
         ApiKeyCreateRequest: {
+            /** Name */
+            name: string;
             /**
              * Environment
              * @default live
              */
             environment: string;
-            /** Name */
-            name: string;
         };
         /** ApiKeyCreateResponse */
         ApiKeyCreateResponse: {
             /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Is Active */
-            is_active: boolean;
-            /** Key Hint */
-            key_hint: string;
-            /** Key Prefix */
-            key_prefix: string;
-            /** Name */
-            name: string;
             /**
              * Project Id
              * Format: uuid
              */
             project_id: string;
-            /** Raw Key */
-            raw_key: string;
+            /** Name */
+            name: string;
+            /** Key Prefix */
+            key_prefix: string;
+            /** Key Hint */
+            key_hint: string;
+            /** Is Active */
+            is_active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
             /** Revoked At */
             revoked_at: string | null;
+            /** Raw Key */
+            raw_key: string;
         };
         /** ApiKeyResponse */
         ApiKeyResponse: {
             /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Is Active */
-            is_active: boolean;
-            /** Key Hint */
-            key_hint: string;
-            /** Key Prefix */
-            key_prefix: string;
-            /** Name */
-            name: string;
             /**
              * Project Id
              * Format: uuid
              */
             project_id: string;
+            /** Name */
+            name: string;
+            /** Key Prefix */
+            key_prefix: string;
+            /** Key Hint */
+            key_hint: string;
+            /** Is Active */
+            is_active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
             /** Revoked At */
             revoked_at: string | null;
         };
@@ -617,15 +860,6 @@ export interface components {
         BillingPeriod: "monthly" | "yearly" | "weekly" | "one_time";
         /** CreditBalanceResponse */
         CreditBalanceResponse: {
-            /** Balance */
-            balance: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Customer External Id */
-            customer_external_id: string;
             /**
              * Id
              * Format: uuid
@@ -636,24 +870,33 @@ export interface components {
              * Format: uuid
              */
             project_id: string;
-            /** Total Consumed */
-            total_consumed: string;
+            /** Customer External Id */
+            customer_external_id: string;
+            /** Balance */
+            balance: string;
             /** Total Granted */
             total_granted: string;
+            /** Total Consumed */
+            total_consumed: string;
+            /** Version */
+            version: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Version */
-            version: number;
         };
         /** CreditDeductRequest */
         CreditDeductRequest: {
-            /** Amount */
-            amount: number | string;
             /** Customer External Id */
             customer_external_id: string;
+            /** Amount */
+            amount: number | string;
             /** Description */
             description?: string | null;
             /** Idempotency Key */
@@ -668,10 +911,10 @@ export interface components {
         };
         /** CreditGrantRequest */
         CreditGrantRequest: {
-            /** Amount */
-            amount: number | string;
             /** Customer External Id */
             customer_external_id: string;
+            /** Amount */
+            amount: number | string;
             /** Description */
             description?: string | null;
             /** Idempotency Key */
@@ -686,26 +929,28 @@ export interface components {
         };
         /** CreditTransactionResponse */
         CreditTransactionResponse: {
-            /** Amount */
-            amount: string;
-            /** Balance After */
-            balance_after: string;
-            /** Balance Before */
-            balance_before: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Customer External Id */
-            customer_external_id: string;
-            /** Description */
-            description: string | null;
             /**
              * Id
              * Format: uuid
              */
             id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Customer External Id */
+            customer_external_id: string;
+            /** Transaction Type */
+            transaction_type: string;
+            /** Amount */
+            amount: string;
+            /** Balance Before */
+            balance_before: string;
+            /** Balance After */
+            balance_after: string;
+            /** Description */
+            description: string | null;
             /** Idempotency Key */
             idempotency_key: string | null;
             /** Metadata */
@@ -713,12 +958,23 @@ export interface components {
                 [key: string]: unknown;
             };
             /**
-             * Project Id
-             * Format: uuid
+             * Created At
+             * Format: date-time
              */
-            project_id: string;
-            /** Transaction Type */
-            transaction_type: string;
+            created_at: string;
+        };
+        /** EmailVerificationConfirm */
+        EmailVerificationConfirm: {
+            /** Token */
+            token: string;
+        };
+        /** EmailVerificationRequest */
+        EmailVerificationRequest: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -753,16 +1009,30 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** MessageResponse */
+        MessageResponse: {
+            /** Message */
+            message: string;
+            /** Reset Token */
+            reset_token?: string | null;
+            /** Verification Token */
+            verification_token?: string | null;
+        };
         /** MeterCreateRequest */
         MeterCreateRequest: {
-            /** Aggregation Field */
-            aggregation_field?: string | null;
-            /** @default count */
-            aggregation_type: components["schemas"]["AggregationType"];
-            /** Description */
-            description?: string | null;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Name */
+            name: string;
             /** Event Name */
             event_name: string;
+            /** @default count */
+            aggregation_type: components["schemas"]["AggregationType"];
+            /** Aggregation Field */
+            aggregation_field?: string | null;
             /**
              * Filter Conditions
              * @default {}
@@ -770,6 +1040,8 @@ export interface components {
             filter_conditions: {
                 [key: string]: unknown;
             };
+            /** Description */
+            description?: string | null;
             /**
              * Metadata
              * @default {}
@@ -777,53 +1049,46 @@ export interface components {
             metadata: {
                 [key: string]: unknown;
             };
-            /** Name */
-            name: string;
-            /**
-             * Project Id
-             * Format: uuid
-             */
-            project_id: string;
         };
         /** MeterResponse */
         MeterResponse: {
-            /** Aggregation Field */
-            aggregation_field: string | null;
-            /** Aggregation Type */
-            aggregation_type: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Description */
-            description: string | null;
-            /** Event Name */
-            event_name: string;
-            /** Filter Conditions */
-            filter_conditions: {
-                [key: string]: unknown;
-            };
             /**
              * Id
              * Format: uuid
              */
             id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Event Name */
+            event_name: string;
+            /** Aggregation Type */
+            aggregation_type: string;
+            /** Aggregation Field */
+            aggregation_field: string | null;
+            /** Filter Conditions */
+            filter_conditions: {
+                [key: string]: unknown;
+            };
+            /** Description */
+            description: string | null;
             /** Is Active */
             is_active: boolean;
             /** Metadata */
             metadata_: {
                 [key: string]: unknown;
             };
-            /** Name */
-            name: string;
             /**
-             * Project Id
-             * Format: uuid
+             * Created At
+             * Format: date-time
              */
-            project_id: string;
-            /** Slug */
-            slug: string;
+            created_at: string;
             /**
              * Updated At
              * Format: date-time
@@ -832,6 +1097,8 @@ export interface components {
         };
         /** MeterUpdateRequest */
         MeterUpdateRequest: {
+            /** Name */
+            name?: string | null;
             /** Description */
             description?: string | null;
             /** Is Active */
@@ -840,40 +1107,31 @@ export interface components {
             metadata?: {
                 [key: string]: unknown;
             } | null;
-            /** Name */
-            name?: string | null;
         };
         /** OrgMemberResponse */
         OrgMemberResponse: {
-            /**
-             * Joined At
-             * Format: date-time
-             */
-            joined_at: string;
-            /** Role */
-            role: string;
             /**
              * User Id
              * Format: uuid
              */
             user_id: string;
+            /** Role */
+            role: string;
+            /**
+             * Joined At
+             * Format: date-time
+             */
+            joined_at: string;
         };
         /** OrganizationCreateRequest */
         OrganizationCreateRequest: {
-            /** Billing Email */
-            billing_email?: string | null;
             /** Name */
             name: string;
+            /** Billing Email */
+            billing_email?: string | null;
         };
         /** OrganizationResponse */
         OrganizationResponse: {
-            /** Billing Email */
-            billing_email: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
             /**
              * Id
              * Format: uuid
@@ -883,25 +1141,64 @@ export interface components {
             name: string;
             /** Slug */
             slug: string;
+            /** Billing Email */
+            billing_email: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** OrganizationUpdateRequest */
         OrganizationUpdateRequest: {
-            /** Billing Email */
-            billing_email?: string | null;
             /** Name */
             name?: string | null;
+            /** Billing Email */
+            billing_email?: string | null;
+        };
+        /** PasswordResetConfirm */
+        PasswordResetConfirm: {
+            /** Token */
+            token: string;
+            /** New Password */
+            new_password: string;
+        };
+        /** PasswordResetRequest */
+        PasswordResetRequest: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
         };
         /** PlanCreateRequest */
         PlanCreateRequest: {
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
             /** @default monthly */
             billing_period: components["schemas"]["BillingPeriod"];
+            /**
+             * Price
+             * @default 0
+             */
+            price: number | string;
             /**
              * Currency
              * @default USD
              */
             currency: string;
-            /** Description */
-            description?: string | null;
+            /**
+             * Trial Days
+             * @default 0
+             */
+            trial_days: number;
             /**
              * Is Public
              * @default true
@@ -919,37 +1216,20 @@ export interface components {
              * @default []
              */
             meter_limits: components["schemas"]["PlanMeterLimitCreateRequest"][];
-            /** Name */
-            name: string;
-            /**
-             * Price
-             * @default 0
-             */
-            price: number | string;
-            /**
-             * Project Id
-             * Format: uuid
-             */
-            project_id: string;
-            /**
-             * Trial Days
-             * @default 0
-             */
-            trial_days: number;
         };
         /** PlanMeterLimitCreateRequest */
         PlanMeterLimitCreateRequest: {
-            /** Included Units */
-            included_units?: number | null;
-            /** @default hard */
-            limit_type: components["schemas"]["LimitType"];
             /**
              * Meter Id
              * Format: uuid
              */
             meter_id: string;
+            /** Included Units */
+            included_units?: number | null;
             /** Overage Rate */
             overage_rate?: number | string | null;
+            /** @default hard */
+            limit_type: components["schemas"]["LimitType"];
         };
         /** PlanMeterLimitResponse */
         PlanMeterLimitResponse: {
@@ -958,41 +1238,49 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            /** Included Units */
-            included_units: number | null;
-            /** Limit Type */
-            limit_type: string;
-            /**
-             * Meter Id
-             * Format: uuid
-             */
-            meter_id: string;
-            /** Overage Rate */
-            overage_rate: string | null;
             /**
              * Plan Id
              * Format: uuid
              */
             plan_id: string;
+            /**
+             * Meter Id
+             * Format: uuid
+             */
+            meter_id: string;
+            /** Included Units */
+            included_units: number | null;
+            /** Overage Rate */
+            overage_rate: string | null;
+            /** Limit Type */
+            limit_type: string;
         };
         /** PlanResponse */
         PlanResponse: {
-            /** Billing Period */
-            billing_period: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Currency */
-            currency: string;
-            /** Description */
-            description: string | null;
             /**
              * Id
              * Format: uuid
              */
             id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Description */
+            description: string | null;
+            /** Billing Period */
+            billing_period: string;
+            /** Price */
+            price: string;
+            /** Currency */
+            currency: string;
+            /** Trial Days */
+            trial_days: number;
             /** Is Active */
             is_active: boolean;
             /** Is Public */
@@ -1003,19 +1291,11 @@ export interface components {
             };
             /** Meter Limits */
             meter_limits: components["schemas"]["PlanMeterLimitResponse"][];
-            /** Name */
-            name: string;
-            /** Price */
-            price: string;
             /**
-             * Project Id
-             * Format: uuid
+             * Created At
+             * Format: date-time
              */
-            project_id: string;
-            /** Slug */
-            slug: string;
-            /** Trial Days */
-            trial_days: number;
+            created_at: string;
             /**
              * Updated At
              * Format: date-time
@@ -1024,8 +1304,12 @@ export interface components {
         };
         /** PlanUpdateRequest */
         PlanUpdateRequest: {
+            /** Name */
+            name?: string | null;
             /** Description */
             description?: string | null;
+            /** Trial Days */
+            trial_days?: number | null;
             /** Is Active */
             is_active?: boolean | null;
             /** Is Public */
@@ -1034,52 +1318,72 @@ export interface components {
             metadata?: {
                 [key: string]: unknown;
             } | null;
-            /** Name */
-            name?: string | null;
-            /** Trial Days */
-            trial_days?: number | null;
+        };
+        /**
+         * PlatformStatsResponse
+         * @description Platform-wide totals for the super-admin overview.
+         */
+        PlatformStatsResponse: {
+            /** Total Users */
+            total_users: number;
+            /** Total Organizations */
+            total_organizations: number;
+            /** Total Projects */
+            total_projects: number;
+            /** Active Projects */
+            active_projects: number;
+            /** Total Subscriptions */
+            total_subscriptions: number;
+            /** Active Subscriptions */
+            active_subscriptions: number;
+            /** Total Usage Events */
+            total_usage_events: number;
+            /** Total Credits Granted */
+            total_credits_granted: string;
+            /** Total Credits Deducted */
+            total_credits_deducted: string;
         };
         /** ProjectCreateRequest */
         ProjectCreateRequest: {
-            /** Description */
-            description?: string | null;
             /** Name */
             name: string;
+            /** Description */
+            description?: string | null;
         };
         /** ProjectResponse */
         ProjectResponse: {
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Description */
-            description: string | null;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Is Active */
-            is_active: boolean;
-            /** Name */
-            name: string;
             /**
              * Organization Id
              * Format: uuid
              */
             organization_id: string;
+            /** Name */
+            name: string;
             /** Slug */
             slug: string;
+            /** Description */
+            description: string | null;
+            /** Is Active */
+            is_active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** ProjectUpdateRequest */
         ProjectUpdateRequest: {
+            /** Name */
+            name?: string | null;
             /** Description */
             description?: string | null;
             /** Is Active */
             is_active?: boolean | null;
-            /** Name */
-            name?: string | null;
         };
         /** RegistrationRequest */
         RegistrationRequest: {
@@ -1088,31 +1392,31 @@ export interface components {
              * Format: email
              */
             email: string;
+            /** Password */
+            password: string;
             /** First Name */
             first_name: string;
             /** Last Name */
             last_name: string;
             /** Organization Name */
             organization_name?: string | null;
-            /** Password */
-            password: string;
         };
         /** RevenueAnalyticsResponse */
         RevenueAnalyticsResponse: {
-            /** Data */
-            data: components["schemas"]["RevenueDataPoint"][];
-            /** From */
-            from_: string | null;
-            /** Granularity */
-            granularity: string;
             /**
              * Project Id
              * Format: uuid
              */
             project_id: string;
-            subscriptions: components["schemas"]["SubscriptionSummary"];
+            /** Granularity */
+            granularity: string;
+            /** From */
+            from_: string | null;
             /** To */
             to: string | null;
+            /** Data */
+            data: components["schemas"]["RevenueDataPoint"][];
+            subscriptions: components["schemas"]["SubscriptionSummary"];
         };
         /** RevenueDataPoint */
         RevenueDataPoint: {
@@ -1121,15 +1425,20 @@ export interface components {
              * Format: date-time
              */
             bucket: string;
-            /** Credits Deducted */
-            credits_deducted: string;
             /** Credits Granted */
             credits_granted: string;
+            /** Credits Deducted */
+            credits_deducted: string;
             /** Transaction Count */
             transaction_count: number;
         };
         /** SubscriptionCreateRequest */
         SubscriptionCreateRequest: {
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
             /** Customer External Id */
             customer_external_id: string;
             /**
@@ -1139,53 +1448,48 @@ export interface components {
             metadata: {
                 [key: string]: unknown;
             };
-            /**
-             * Plan Id
-             * Format: uuid
-             */
-            plan_id: string;
         };
         /** SubscriptionResponse */
         SubscriptionResponse: {
-            /** Canceled At */
-            canceled_at: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Current Period End */
-            current_period_end: string | null;
-            /**
-             * Current Period Start
-             * Format: date-time
-             */
-            current_period_start: string;
-            /** Customer External Id */
-            customer_external_id: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Metadata */
-            metadata_: {
-                [key: string]: unknown;
-            };
-            /**
-             * Plan Id
-             * Format: uuid
-             */
-            plan_id: string;
             /**
              * Project Id
              * Format: uuid
              */
             project_id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /** Customer External Id */
+            customer_external_id: string;
             /** Status */
             status: string;
+            /**
+             * Current Period Start
+             * Format: date-time
+             */
+            current_period_start: string;
+            /** Current Period End */
+            current_period_end: string | null;
             /** Trial End Date */
             trial_end_date: string | null;
+            /** Canceled At */
+            canceled_at: string | null;
+            /** Metadata */
+            metadata_: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
             /**
              * Updated At
              * Format: date-time
@@ -1201,18 +1505,18 @@ export interface components {
         SubscriptionSummary: {
             /** Active Count */
             active_count: number;
-            /** Canceled Count */
-            canceled_count: number;
             /** Trialing Count */
             trialing_count: number;
+            /** Canceled Count */
+            canceled_count: number;
         };
         /** SubscriptionUpdateRequest */
         SubscriptionUpdateRequest: {
+            status?: components["schemas"]["SubscriptionStatus"] | null;
             /** Metadata */
             metadata?: {
                 [key: string]: unknown;
             } | null;
-            status?: components["schemas"]["SubscriptionStatus"] | null;
         };
         /** TokenRefreshRequest */
         TokenRefreshRequest: {
@@ -1223,13 +1527,13 @@ export interface components {
         TokenResponse: {
             /** Access Token */
             access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
             /**
              * Expires In
              * @default 720
              */
             expires_in: number;
-            /** Refresh Token */
-            refresh_token: string;
             /**
              * Token Type
              * @default bearer
@@ -1238,19 +1542,19 @@ export interface components {
         };
         /** UsageAnalyticsResponse */
         UsageAnalyticsResponse: {
-            /** From */
-            from_: string | null;
-            /** Granularity */
-            granularity: string;
-            /** Meters */
-            meters: components["schemas"]["UsageMeterSeries"][];
             /**
              * Project Id
              * Format: uuid
              */
             project_id: string;
+            /** Granularity */
+            granularity: string;
+            /** From */
+            from_: string | null;
             /** To */
             to: string | null;
+            /** Meters */
+            meters: components["schemas"]["UsageMeterSeries"][];
         };
         /** UsageDataPoint */
         UsageDataPoint: {
@@ -1271,12 +1575,15 @@ export interface components {
         };
         /** UsageEventRequest */
         UsageEventRequest: {
-            /** Customer External Id */
-            customer_external_id: string;
             /** Event Name */
             event_name: string;
-            /** Idempotency Key */
-            idempotency_key?: string | null;
+            /** Customer External Id */
+            customer_external_id: string;
+            /**
+             * Value
+             * @default 1
+             */
+            value: number | string;
             /**
              * Properties
              * @default {}
@@ -1284,158 +1591,169 @@ export interface components {
             properties: {
                 [key: string]: unknown;
             };
+            /** Idempotency Key */
+            idempotency_key?: string | null;
             /** Timestamp */
             timestamp?: string | null;
-            /**
-             * Value
-             * @default 1
-             */
-            value: number | string;
         };
         /** UsageEventResponse */
         UsageEventResponse: {
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Customer External Id */
-            customer_external_id: string;
-            /** Event Name */
-            event_name: string;
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Idempotency Key */
-            idempotency_key: string | null;
-            /**
-             * Meter Id
-             * Format: uuid
-             */
-            meter_id: string;
-            /** Processed */
-            processed: boolean;
             /**
              * Project Id
              * Format: uuid
              */
             project_id: string;
+            /**
+             * Meter Id
+             * Format: uuid
+             */
+            meter_id: string;
+            /** Customer External Id */
+            customer_external_id: string;
+            /** Event Name */
+            event_name: string;
+            /** Value */
+            value: string;
             /** Properties */
             properties: {
                 [key: string]: unknown;
             };
+            /** Idempotency Key */
+            idempotency_key: string | null;
+            /** Processed */
+            processed: boolean;
             /**
              * Timestamp
              * Format: date-time
              */
             timestamp: string;
-            /** Value */
-            value: string;
-        };
-        /** UsageMeterSeries */
-        UsageMeterSeries: {
-            /** Data */
-            data: components["schemas"]["UsageDataPoint"][];
-            /** Event Name */
-            event_name: string;
-            /**
-             * Meter Id
-             * Format: uuid
-             */
-            meter_id: string;
-            /** Meter Name */
-            meter_name: string;
-        };
-        /** UsageSummaryItem */
-        UsageSummaryItem: {
-            /** Aggregation Type */
-            aggregation_type: string;
-            /** Event Count */
-            event_count: number;
-            /** Event Name */
-            event_name: string;
-            /**
-             * Meter Id
-             * Format: uuid
-             */
-            meter_id: string;
-            /** Meter Name */
-            meter_name: string;
-            /** Value */
-            value: string;
-        };
-        /** UsageSummaryResponse */
-        UsageSummaryResponse: {
-            /** Customer External Id */
-            customer_external_id: string;
-            /** From */
-            from_: string | null;
-            /** Meters */
-            meters: components["schemas"]["UsageSummaryItem"][];
-            /**
-             * Project Id
-             * Format: uuid
-             */
-            project_id: string;
-            /** To */
-            to: string | null;
-        };
-        /** UserResponse */
-        UserResponse: {
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+        };
+        /** UsageMeterSeries */
+        UsageMeterSeries: {
             /**
-             * Email
-             * Format: email
+             * Meter Id
+             * Format: uuid
              */
-            email: string;
-            /** Email Verified */
-            email_verified: boolean;
-            /** First Name */
-            first_name: string | null;
+            meter_id: string;
+            /** Meter Name */
+            meter_name: string;
+            /** Event Name */
+            event_name: string;
+            /** Data */
+            data: components["schemas"]["UsageDataPoint"][];
+        };
+        /** UsageSummaryItem */
+        UsageSummaryItem: {
+            /**
+             * Meter Id
+             * Format: uuid
+             */
+            meter_id: string;
+            /** Meter Name */
+            meter_name: string;
+            /** Event Name */
+            event_name: string;
+            /** Aggregation Type */
+            aggregation_type: string;
+            /** Value */
+            value: string;
+            /** Event Count */
+            event_count: number;
+        };
+        /** UsageSummaryResponse */
+        UsageSummaryResponse: {
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Customer External Id */
+            customer_external_id: string;
+            /** From */
+            from_: string | null;
+            /** To */
+            to: string | null;
+            /** Meters */
+            meters: components["schemas"]["UsageSummaryItem"][];
+        };
+        /** UserResponse */
+        UserResponse: {
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Is Active */
-            is_active: boolean;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** First Name */
+            first_name: string | null;
             /** Last Name */
             last_name: string | null;
+            /** Email Verified */
+            email_verified: boolean;
+            /** Is Active */
+            is_active: boolean;
+            /**
+             * Is Superuser
+             * @default false
+             */
+            is_superuser: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** UserUpdateRequest */
         UserUpdateRequest: {
-            /** Avatar Url */
-            avatar_url?: string | null;
             /** Email */
             email?: string | null;
             /** First Name */
             first_name?: string | null;
             /** Last Name */
             last_name?: string | null;
+            /** Avatar Url */
+            avatar_url?: string | null;
         };
         /** ValidationError */
         ValidationError: {
-            /** Context */
-            ctx?: Record<string, never>;
-            /** Input */
-            input?: unknown;
             /** Location */
             loc: (string | number)[];
             /** Message */
             msg: string;
             /** Error Type */
             type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
         /** WebhookCreateRequest */
         WebhookCreateRequest: {
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Url */
+            url: string;
             /** Events */
             events: string[];
+            /** Secret */
+            secret?: string | null;
             /**
              * Metadata
              * @default {}
@@ -1443,15 +1761,6 @@ export interface components {
             metadata: {
                 [key: string]: unknown;
             };
-            /**
-             * Project Id
-             * Format: uuid
-             */
-            project_id: string;
-            /** Secret */
-            secret?: string | null;
-            /** Url */
-            url: string;
         };
         /**
          * WebhookCreateResponse
@@ -1459,77 +1768,77 @@ export interface components {
          */
         WebhookCreateResponse: {
             /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Events */
-            events: string[];
-            /** Failure Count */
-            failure_count: number;
-            /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Is Active */
-            is_active: boolean;
-            /** Last Triggered At */
-            last_triggered_at: string | null;
-            /** Metadata */
-            metadata_: {
-                [key: string]: unknown;
-            };
             /**
              * Project Id
              * Format: uuid
              */
             project_id: string;
-            /** Secret */
-            secret: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
             /** Url */
             url: string;
-        };
-        /** WebhookDeliveryResponse */
-        WebhookDeliveryResponse: {
-            /** Attempts */
-            attempts: number;
-            /** Completed At */
-            completed_at: string | null;
+            /** Events */
+            events: string[];
+            /** Is Active */
+            is_active: boolean;
+            /** Last Triggered At */
+            last_triggered_at: string | null;
+            /** Failure Count */
+            failure_count: number;
+            /** Metadata */
+            metadata_: {
+                [key: string]: unknown;
+            };
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
-            /** Event Type */
-            event_type: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Secret */
+            secret: string;
+        };
+        /** WebhookDeliveryResponse */
+        WebhookDeliveryResponse: {
             /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Next Retry At */
-            next_retry_at: string | null;
-            /** Payload */
-            payload: {
-                [key: string]: unknown;
-            };
-            /** Response Body */
-            response_body: string | null;
-            /** Response Code */
-            response_code: number | null;
-            /** Status */
-            status: string;
             /**
              * Webhook Id
              * Format: uuid
              */
             webhook_id: string;
+            /** Event Type */
+            event_type: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /** Status */
+            status: string;
+            /** Response Code */
+            response_code: number | null;
+            /** Response Body */
+            response_body: string | null;
+            /** Attempts */
+            attempts: number;
+            /** Next Retry At */
+            next_retry_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Completed At */
+            completed_at: string | null;
         };
         /**
          * WebhookResponse
@@ -1537,42 +1846,44 @@ export interface components {
          */
         WebhookResponse: {
             /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /** Events */
-            events: string[];
-            /** Failure Count */
-            failure_count: number;
-            /**
              * Id
              * Format: uuid
              */
             id: string;
-            /** Is Active */
-            is_active: boolean;
-            /** Last Triggered At */
-            last_triggered_at: string | null;
-            /** Metadata */
-            metadata_: {
-                [key: string]: unknown;
-            };
             /**
              * Project Id
              * Format: uuid
              */
             project_id: string;
+            /** Url */
+            url: string;
+            /** Events */
+            events: string[];
+            /** Is Active */
+            is_active: boolean;
+            /** Last Triggered At */
+            last_triggered_at: string | null;
+            /** Failure Count */
+            failure_count: number;
+            /** Metadata */
+            metadata_: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
             /**
              * Updated At
              * Format: date-time
              */
             updated_at: string;
-            /** Url */
-            url: string;
         };
         /** WebhookUpdateRequest */
         WebhookUpdateRequest: {
+            /** Url */
+            url?: string | null;
             /** Events */
             events?: string[] | null;
             /** Is Active */
@@ -1581,8 +1892,6 @@ export interface components {
             metadata?: {
                 [key: string]: unknown;
             } | null;
-            /** Url */
-            url?: string | null;
         };
     };
     responses: never;
@@ -1593,14 +1902,9 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    revenue_analytics_api_v1_analytics_revenue_get: {
+    health_check_health_get: {
         parameters: {
-            query: {
-                project_id: string;
-                from_?: string | null;
-                to?: string | null;
-                granularity?: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -1613,154 +1917,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["RevenueAnalyticsResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": unknown;
                 };
             };
         };
     };
-    usage_analytics_api_v1_analytics_usage_get: {
-        parameters: {
-            query: {
-                project_id: string;
-                meter_id?: string | null;
-                customer_id?: string | null;
-                from_?: string | null;
-                to?: string | null;
-                granularity?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UsageAnalyticsResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    revoke_api_v1_api_keys__key_id__delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                key_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiKeyResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    login_api_v1_auth_login_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TokenResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    refresh_api_v1_auth_refresh_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TokenRefreshRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TokenResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    registration_api_v1_auth_registration_post: {
+    register: {
         parameters: {
             query?: never;
             header?: never;
@@ -1793,7 +1955,7 @@ export interface operations {
             };
         };
     };
-    deduct_api_v1_credits_deduct_post: {
+    login: {
         parameters: {
             query?: never;
             header?: never;
@@ -1802,17 +1964,17 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreditDeductRequest"];
+                "application/json": components["schemas"]["LoginRequest"];
             };
         };
         responses: {
             /** @description Successful Response */
-            201: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CreditTransactionResponse"];
+                    "application/json": components["schemas"]["TokenResponse"];
                 };
             };
             /** @description Validation Error */
@@ -1826,7 +1988,7 @@ export interface operations {
             };
         };
     };
-    grant_api_v1_credits_grant_post: {
+    refreshToken: {
         parameters: {
             query?: never;
             header?: never;
@@ -1835,40 +1997,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreditGrantRequest"];
+                "application/json": components["schemas"]["TokenRefreshRequest"];
             };
         };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CreditTransactionResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    balance_api_v1_credits__customer_id__balance_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                customer_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -1876,7 +2007,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CreditBalanceResponse"];
+                    "application/json": components["schemas"]["TokenResponse"];
                 };
             };
             /** @description Validation Error */
@@ -1890,16 +2021,18 @@ export interface operations {
             };
         };
     };
-    transactions_api_v1_credits__customer_id__transactions_get: {
+    requestPasswordReset: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                customer_id: string;
-            };
+            path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordResetRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -1907,7 +2040,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CreditTransactionResponse"][];
+                    "application/json": components["schemas"]["MessageResponse"];
                 };
             };
             /** @description Validation Error */
@@ -1921,11 +2054,108 @@ export interface operations {
             };
         };
     };
-    list_all_api_v1_meters_get: {
+    confirmPasswordReset: {
         parameters: {
-            query: {
-                project_id: string;
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordResetConfirm"];
             };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    requestEmailVerification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailVerificationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirmEmailVerification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailVerificationConfirm"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get: {
+        parameters: {
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -1938,21 +2168,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MeterResponse"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["UserResponse"];
                 };
             };
         };
     };
-    create_api_v1_meters_post: {
+    update: {
         parameters: {
             query?: never;
             header?: never;
@@ -1961,104 +2182,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MeterCreateRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MeterResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_one_api_v1_meters__meter_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                meter_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MeterResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_api_v1_meters__meter_id__delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                meter_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MeterResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_api_v1_meters__meter_id__patch: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                meter_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MeterUpdateRequest"];
+                "application/json": components["schemas"]["UserUpdateRequest"];
             };
         };
         responses: {
@@ -2068,7 +2192,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MeterResponse"];
+                    "application/json": components["schemas"]["UserResponse"];
                 };
             };
             /** @description Validation Error */
@@ -2082,7 +2206,7 @@ export interface operations {
             };
         };
     };
-    list_orgs_api_v1_organizations_get: {
+    list: {
         parameters: {
             query?: never;
             header?: never;
@@ -2102,7 +2226,7 @@ export interface operations {
             };
         };
     };
-    create_api_v1_organizations_post: {
+    create: {
         parameters: {
             query?: never;
             header?: never;
@@ -2135,7 +2259,7 @@ export interface operations {
             };
         };
     };
-    get_org_api_v1_organizations__org_id__get: {
+    get: {
         parameters: {
             query?: never;
             header?: never;
@@ -2166,7 +2290,7 @@ export interface operations {
             };
         };
     };
-    update_org_api_v1_organizations__org_id__patch: {
+    update: {
         parameters: {
             query?: never;
             header?: never;
@@ -2201,7 +2325,7 @@ export interface operations {
             };
         };
     };
-    invite_api_v1_organizations__org_id__members_post: {
+    invite: {
         parameters: {
             query?: never;
             header?: never;
@@ -2236,7 +2360,7 @@ export interface operations {
             };
         };
     };
-    list_projs_api_v1_organizations__org_id__projects_get: {
+    list: {
         parameters: {
             query?: never;
             header?: never;
@@ -2267,7 +2391,7 @@ export interface operations {
             };
         };
     };
-    create_api_v1_organizations__org_id__projects_post: {
+    create: {
         parameters: {
             query?: never;
             header?: never;
@@ -2302,7 +2426,7 @@ export interface operations {
             };
         };
     };
-    get_proj_api_v1_organizations__org_id__projects__project_id__get: {
+    get: {
         parameters: {
             query?: never;
             header?: never;
@@ -2334,7 +2458,7 @@ export interface operations {
             };
         };
     };
-    delete_proj_api_v1_organizations__org_id__projects__project_id__delete: {
+    delete: {
         parameters: {
             query?: never;
             header?: never;
@@ -2366,7 +2490,7 @@ export interface operations {
             };
         };
     };
-    update_proj_api_v1_organizations__org_id__projects__project_id__patch: {
+    update: {
         parameters: {
             query?: never;
             header?: never;
@@ -2402,7 +2526,7 @@ export interface operations {
             };
         };
     };
-    list_keys_api_v1_organizations__org_id__projects__project_id__api_keys_get: {
+    list: {
         parameters: {
             query?: never;
             header?: never;
@@ -2434,7 +2558,7 @@ export interface operations {
             };
         };
     };
-    create_api_v1_organizations__org_id__projects__project_id__api_keys_post: {
+    generate: {
         parameters: {
             query?: never;
             header?: never;
@@ -2470,7 +2594,231 @@ export interface operations {
             };
         };
     };
-    list_all_api_v1_plans_get: {
+    issueDashboardKey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiKeyCreateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiKeyResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query: {
+                project_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeterResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeterCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeterResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meter_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeterResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meter_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeterResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meter_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeterUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeterResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list: {
         parameters: {
             query?: {
                 project_id?: string | null;
@@ -2501,7 +2849,7 @@ export interface operations {
             };
         };
     };
-    create_api_v1_plans_post: {
+    create: {
         parameters: {
             query?: never;
             header?: never;
@@ -2534,7 +2882,7 @@ export interface operations {
             };
         };
     };
-    get_one_api_v1_plans__plan_id__get: {
+    get: {
         parameters: {
             query?: {
                 project_id?: string | null;
@@ -2567,7 +2915,7 @@ export interface operations {
             };
         };
     };
-    delete_api_v1_plans__plan_id__delete: {
+    delete: {
         parameters: {
             query?: never;
             header?: never;
@@ -2598,7 +2946,7 @@ export interface operations {
             };
         };
     };
-    update_api_v1_plans__plan_id__patch: {
+    update: {
         parameters: {
             query?: never;
             header?: never;
@@ -2633,7 +2981,7 @@ export interface operations {
             };
         };
     };
-    list_all_api_v1_subscriptions_get: {
+    list: {
         parameters: {
             query?: {
                 customer_id?: string | null;
@@ -2664,7 +3012,7 @@ export interface operations {
             };
         };
     };
-    create_api_v1_subscriptions_post: {
+    create: {
         parameters: {
             query?: never;
             header?: never;
@@ -2697,7 +3045,7 @@ export interface operations {
             };
         };
     };
-    get_one_api_v1_subscriptions__subscription_id__get: {
+    get: {
         parameters: {
             query?: never;
             header?: never;
@@ -2728,7 +3076,7 @@ export interface operations {
             };
         };
     };
-    delete_api_v1_subscriptions__subscription_id__delete: {
+    delete: {
         parameters: {
             query?: never;
             header?: never;
@@ -2759,7 +3107,7 @@ export interface operations {
             };
         };
     };
-    update_api_v1_subscriptions__subscription_id__patch: {
+    update: {
         parameters: {
             query?: never;
             header?: never;
@@ -2794,7 +3142,135 @@ export interface operations {
             };
         };
     };
-    create_event_api_v1_usage_events_post: {
+    grant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreditGrantRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditTransactionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreditDeductRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditTransactionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    checkBalance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                customer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditBalanceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    transactions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                customer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditTransactionResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record: {
         parameters: {
             query?: never;
             header?: never;
@@ -2827,7 +3303,7 @@ export interface operations {
             };
         };
     };
-    create_batch_api_v1_usage_events_batch_post: {
+    recordInBatch: {
         parameters: {
             query?: never;
             header?: never;
@@ -2860,7 +3336,7 @@ export interface operations {
             };
         };
     };
-    summary_api_v1_usage__customer_id__get: {
+    get: {
         parameters: {
             query?: {
                 meter_id?: string | null;
@@ -2895,60 +3371,7 @@ export interface operations {
             };
         };
     };
-    get_me_api_v1_users_me_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserResponse"];
-                };
-            };
-        };
-    };
-    patch_me_api_v1_users_me_patch: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserUpdateRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_webhooks_api_v1_webhooks_get: {
+    list: {
         parameters: {
             query: {
                 project_id: string;
@@ -2979,7 +3402,7 @@ export interface operations {
             };
         };
     };
-    register_webhook_api_v1_webhooks_post: {
+    register: {
         parameters: {
             query?: never;
             header?: never;
@@ -3012,7 +3435,7 @@ export interface operations {
             };
         };
     };
-    get_webhook_by_id_api_v1_webhooks__webhook_id__get: {
+    get: {
         parameters: {
             query?: never;
             header?: never;
@@ -3043,7 +3466,7 @@ export interface operations {
             };
         };
     };
-    remove_webhook_api_v1_webhooks__webhook_id__delete: {
+    delete: {
         parameters: {
             query?: never;
             header?: never;
@@ -3074,7 +3497,7 @@ export interface operations {
             };
         };
     };
-    patch_webhook_api_v1_webhooks__webhook_id__patch: {
+    update: {
         parameters: {
             query?: never;
             header?: never;
@@ -3109,7 +3532,7 @@ export interface operations {
             };
         };
     };
-    get_deliveries_api_v1_webhooks__webhook_id__deliveries_get: {
+    listDeliveryAttempts: {
         parameters: {
             query?: never;
             header?: never;
@@ -3140,7 +3563,77 @@ export interface operations {
             };
         };
     };
-    health_check_health_get: {
+    usage: {
+        parameters: {
+            query: {
+                project_id: string;
+                meter_id?: string | null;
+                customer_id?: string | null;
+                from_?: string | null;
+                to?: string | null;
+                granularity?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageAnalyticsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revenue: {
+        parameters: {
+            query: {
+                project_id: string;
+                from_?: string | null;
+                to?: string | null;
+                granularity?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevenueAnalyticsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_stats: {
         parameters: {
             query?: never;
             header?: never;
@@ -3155,7 +3648,67 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["PlatformStatsResponse"];
+                };
+            };
+        };
+    };
+    admin_list_organizations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOrganizationResponse"][];
+                };
+            };
+        };
+    };
+    admin_list_projects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProjectResponse"][];
+                };
+            };
+        };
+    };
+    admin_list_users: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserResponse"][];
                 };
             };
         };
