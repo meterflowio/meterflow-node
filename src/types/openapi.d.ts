@@ -991,8 +991,9 @@ export interface components {
             /**
              * Role
              * @default member
+             * @enum {string}
              */
-            role: string;
+            role: "admin" | "member" | "viewer";
         };
         /**
          * LimitType
