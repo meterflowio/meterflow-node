@@ -4,7 +4,7 @@
 [![node](https://img.shields.io/node/v/meterflow)](https://nodejs.org)
 [![license](https://img.shields.io/npm/l/meterflow)](./LICENSE)
 
-Official Node.js SDK for [MeterFlow](https://meterflow.com) — usage-based billing, credit management, and metering.
+Official Node.js SDK for [MeterFlow](https://www.meter-flow.com) — usage-based billing, credit management, and metering.
 
 Track what your customers use, enforce credit balances, and manage subscriptions with a few lines of code. TypeScript-first, zero runtime dependencies, built on native `fetch`.
 
@@ -36,7 +36,7 @@ Track what your customers use, enforce credit balances, and manage subscriptions
 ## Requirements
 
 - **Node.js ≥ 20** (the SDK uses the built-in `fetch` — no HTTP library is installed)
-- An API key from your [MeterFlow dashboard](https://meterflow.com) (Project → API Keys)
+- An API key from your [MeterFlow dashboard](https://www.meter-flow.com) (Project → API Keys)
 
 > Need Node 18? It reached end-of-life in April 2025 — please upgrade. The last SDK line supporting it is `meterflow@0.2.x`.
 
