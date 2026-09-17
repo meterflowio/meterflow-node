@@ -4,7 +4,7 @@ import { setupServer } from "msw/node";
 import { MeterFlow } from "../../src/client";
 import { AuthError, InsufficientCreditsError, NotFoundError, RateLimitError, ServerError, ValidationError } from "../../src/errors";
 
-const BASE = "https://api.meterflow.com/api/v1";
+const BASE = "https://api.meter-flow.com/api/v1";
 const API_KEY = "mf_test_abc123";
 
 const server = setupServer();

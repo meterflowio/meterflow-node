@@ -4,7 +4,7 @@
 [![node](https://img.shields.io/node/v/meterflow)](https://nodejs.org)
 [![license](https://img.shields.io/npm/l/meterflow)](./LICENSE)
 
-Official Node.js SDK for [MeterFlow](https://www.meter-flow.com) — usage-based billing, credit management, and metering.
+Official Node.js SDK for [MeterFlow](https://meter-flow.com) — usage-based billing, credit management, and metering.
 
 Track what your customers use, enforce credit balances, and manage subscriptions with a few lines of code. TypeScript-first, zero runtime dependencies, built on native `fetch`.
 
@@ -36,7 +36,7 @@ Track what your customers use, enforce credit balances, and manage subscriptions
 ## Requirements
 
 - **Node.js ≥ 20** (the SDK uses the built-in `fetch` — no HTTP library is installed)
-- An API key from your [MeterFlow dashboard](https://www.meter-flow.com) (Project → API Keys)
+- An API key from your [MeterFlow dashboard](https://meter-flow.com) (Project → API Keys)
 
 > Need Node 18? It reached end-of-life in April 2025 — please upgrade. The last SDK line supporting it is `meterflow@0.2.x`.
 
@@ -87,9 +87,11 @@ Every request authenticates with the API key you pass to the constructor:
 | `mf_live_…` | Live | Real customers, real balances |
 | `mf_test_…` | Test | Development, CI, experiments |
 
+The key's environment is a **real data boundary, not a label**: inside the same project, `mf_test_` keys read and write a fully separate dataset from `mf_live_` keys — subscriptions, credits, and usage events created with a test key are invisible to live keys (and vice versa), while your meters and plans are shared, so tests always run against your real billing configuration. The same customer id can hold an independent balance and subscription in each environment, and idempotency keys are namespaced per environment. Point your staging/CI at a test key and production at a live key — same project, zero risk of cross-contamination.
+
 Keys are created in the dashboard (Project → API Keys) and **shown once** at creation — MeterFlow stores only a fingerprint. If a key leaks, revoke it in the dashboard and mint a new one; revocation is immediate.
 
-A key belongs to **one project** and can only see that project's data. Keep live and test traffic in separate projects and the two can never mix.
+A key belongs to **one project** and can only see that project's data.
 
 ```typescript
 const client = new MeterFlow({ apiKey: "mf_test_..." }); // throws immediately if the prefix is neither mf_live_ nor mf_test_
@@ -115,14 +117,14 @@ Meters and plans are defined in the dashboard. Your app, through this SDK, does 
 ```typescript
 const client = new MeterFlow({
   apiKey: "mf_live_...",                        // required — mf_live_* or mf_test_*
-  baseUrl: "https://api.meterflow.com/api/v1",  // optional — override for self-hosted / local dev
+  baseUrl: "https://api.meter-flow.com/api/v1",  // optional — override for self-hosted / local dev
   timeout: 30_000,                              // optional — per-request timeout in ms (default 30 s)
   retries: 3,                                   // optional — automatic retries (default 3, 0 disables)
   fetch: customFetch,                           // optional — inject your own fetch (tests, proxies)
 });
 ```
 
-Running against a local MeterFlow stack? `baseUrl: "http://localhost:8000/api/v1"`.
+`baseUrl` is for pointing at a **different MeterFlow server** — a self-hosted deployment, or a locally running stack if you develop MeterFlow itself (`baseUrl: "http://localhost:8000/api/v1"`). If you use the hosted service, leave it at the default; to test your integration safely, use an `mf_test_` key instead (see [Authentication](#authentication)) — no URL change needed.
 
 All configuration lives on the client instance — there is no global state, so you can create multiple clients (e.g. one per project) in the same process.
 
@@ -248,10 +250,12 @@ console.log(sub.status); // "trialing" if the plan has trial days, else "active"
 **List / get:**
 
 ```typescript
-const all = await client.subscriptions.list();                                // whole project
+const all = await client.subscriptions.list();                                // whole project (in your key's environment)
 const theirs = await client.subscriptions.list({ customer_id: "customer_123" }); // one customer
 const one = await client.subscriptions.get(sub.id);
 ```
+
+> Like all reads, these are scoped to the key's environment: a live key lists live subscriptions only, a test key test ones only.
 
 **Update** — change status or metadata. Statuses: `active`, `trialing`, `past_due`, `paused`, `canceled`, `expired`:
 
@@ -260,11 +264,14 @@ await client.subscriptions.update(sub.id, { status: "paused" });
 await client.subscriptions.update(sub.id, { status: "active" }); // reactivate
 ```
 
-**Cancel:**
+**Cancel vs delete** — two different operations:
 
 ```typescript
-await client.subscriptions.delete(sub.id); // marks it canceled; history is preserved
+await client.subscriptions.update(sub.id, { status: "canceled" }); // cancel: the record stays for history
+await client.subscriptions.delete(sub.id);                          // delete: removes the subscription record entirely
 ```
+
+Prefer cancelling: it preserves the subscription's history (a canceled subscription can't be reactivated). Reach for `delete` only when you truly want the record gone — e.g. cleaning up test data.
 
 ### Plans
 
@@ -381,7 +388,7 @@ Webhooks are registered per-project in the dashboard, which is also where you'll
 
 The root entry point is browser-safe: no Node built-ins, and `fetch` is bound correctly for browser environments. Two rules:
 
-1. **Never ship an `mf_live_` key to a browser.** Anyone can read it in DevTools. Browser usage is for trusted, short-lived contexts (internal tools, dashboards) with `mf_test_` or ephemeral keys — your product's customers should always go through **your** backend, which holds the key.
+1. **Never ship an `mf_live_` key to a browser.** Anyone can read it in DevTools. Browser usage is for trusted, short-lived contexts (internal tools, dashboards) with `mf_test_` or ephemeral keys — your product's customers should always go through **your** backend, which holds the key. (A leaked `mf_test_` key is contained by design: it can only ever touch the sandboxed test dataset, never live balances.)
 2. **Don't import `meterflow/webhook` in browser code** — it needs Node's `crypto` (and verifying webhooks in a browser makes no sense anyway: the secret must stay server-side).
 
 ## TypeScript notes
@@ -394,6 +401,7 @@ The root entry point is browser-safe: no Node built-ins, and `fetch` is bound co
 ## Versioning & support
 
 - Semantic versioning on the `0.x` line: breaking changes bump the minor, fixes bump the patch.
+- `0.4.0` changed the default API base URL to **`https://api.meter-flow.com/api/v1`** (the platform's domain). If you set `baseUrl` explicitly, nothing changes for you.
 - `0.3.0` raised the Node floor to **≥ 20** (Node 18 is end-of-life). `0.2.x` remains available for Node 18.
 - Tested in CI on Node **20, 22 and 24**.
 - Issues and source: [github.com/meterflowio/meterflow-node](https://github.com/meterflowio/meterflow-node). Include the `requestId` from any `MeterFlowError` when reporting API issues.

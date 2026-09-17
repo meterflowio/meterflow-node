@@ -16,7 +16,7 @@ describe("MeterFlow client constructor", () => {
 
   it("defaults baseUrl to production endpoint", () => {
     const client = new MeterFlow({ apiKey: "mf_test_x" });
-    expect(client.options.baseUrl).toBe("https://api.meterflow.com/api/v1");
+    expect(client.options.baseUrl).toBe("https://api.meter-flow.com/api/v1");
   });
 
   it("accepts custom baseUrl", () => {

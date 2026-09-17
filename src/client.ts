@@ -33,7 +33,7 @@ export class MeterFlow {
     }
     this.options = {
       apiKey: options.apiKey,
-      baseUrl: options.baseUrl ?? "https://api.meterflow.com/api/v1",
+      baseUrl: options.baseUrl ?? "https://api.meter-flow.com/api/v1",
       timeout: options.timeout ?? 30_000,
       retries: options.retries ?? 3,
       // Bind to globalThis: browsers throw "Illegal invocation" if window.fetch is

@@ -3,7 +3,7 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { MeterFlow } from "../../src/client";
 
-const BASE = "https://api.meterflow.com/api/v1";
+const BASE = "https://api.meter-flow.com/api/v1";
 const server = setupServer();
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterEach(() => server.resetHandlers());

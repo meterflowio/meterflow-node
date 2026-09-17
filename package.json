@@ -1,6 +1,6 @@
 {
   "name": "meterflow",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Official Node.js SDK for MeterFlow — usage-based billing, credit management, and metering.",
   "license": "MIT",
   "author": "MeterFlow",
