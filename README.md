@@ -354,7 +354,7 @@ try {
 
 ## Verifying webhooks
 
-MeterFlow notifies your app of events you'd otherwise poll for (low balances, renewals, …). Every delivery is signed with **HMAC-SHA256** in the `X-MeterFlow-Signature` header, using the webhook's secret — verify before trusting:
+MeterFlow notifies your app of activity you'd otherwise poll for — credits granted or deducted, usage recorded, subscriptions created or updated. Every delivery is signed with **HMAC-SHA256** in the `X-MeterFlow-Signature` header, using the webhook's secret — verify before trusting:
 
 ```typescript
 import express from "express";
@@ -381,6 +381,33 @@ Details that matter:
 - **Import from `meterflow/webhook`**, not the root package. The verifier uses Node's `crypto` and lives in its own entry point so the main client stays browser-safe.
 - **Verify the raw bytes.** If you `JSON.parse` first and re-stringify, key ordering/whitespace changes and the signature won't match. `express.json()` users: configure it with a `verify` callback to keep `rawBody`, or use `express.raw` on the webhook route as above.
 - The comparison is **timing-safe** (`crypto.timingSafeEqual`) and returns `false` on any mismatch — it never throws on bad input.
+
+### Payload shape & event types
+
+Every delivery is a flat JSON object (`Content-Type: application/json`) with two envelope fields — `event` (the type) and `environment` (`"live"` or `"test"`, matching the mode of the API key that caused the activity) — plus type-specific fields:
+
+| `event` | Fired when | Extra fields |
+|---|---|---|
+| `usage.recorded` | a usage event is ingested (single or batch) | `customer_id`, `event_name`, `value`, `event_id` |
+| `credit.granted` | credits are granted | `customer_id`, `amount`, `balance_after`, `transaction_id` |
+| `credit.deducted` | credits are deducted | `customer_id`, `amount`, `balance_after`, `transaction_id` |
+| `subscription.created` | a subscription is created | `customer_id`, `plan_id`, `subscription_id`, `status` |
+| `subscription.updated` | a subscription is updated | `customer_id`, `subscription_id`, `status` |
+
+For example, a `credit.granted` delivery:
+
+```json
+{
+  "event": "credit.granted",
+  "environment": "live",
+  "customer_id": "cust_123",
+  "amount": 500.0,
+  "balance_after": 1250.0,
+  "transaction_id": "9b2f6c1e-…"
+}
+```
+
+When registering a webhook you pick which of these event types it should receive. Deliveries are retried with backoff on non-2xx responses — respond `200` quickly and do the heavy work asynchronously.
 
 Webhooks are registered per-project in the dashboard, which is also where you'll find the secret and each delivery attempt's status.
 

@@ -1144,6 +1144,10 @@ export interface components {
             slug: string;
             /** Billing Email */
             billing_email: string | null;
+            /** Tier */
+            tier: string;
+            /** Billing Status */
+            billing_status: string;
             /**
              * Created At
              * Format: date-time
@@ -1449,6 +1453,8 @@ export interface components {
             metadata: {
                 [key: string]: unknown;
             };
+            /** Idempotency Key */
+            idempotency_key?: string | null;
         };
         /** SubscriptionResponse */
         SubscriptionResponse: {
@@ -3016,7 +3022,10 @@ export interface operations {
     create: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Idempotency key for safe retries; equivalent to the body's idempotency_key field (the body wins when both are sent). */
+                "Idempotency-Key"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -3146,7 +3155,10 @@ export interface operations {
     grant: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Idempotency key for safe retries; equivalent to the body's idempotency_key field (the body wins when both are sent). */
+                "Idempotency-Key"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -3179,7 +3191,10 @@ export interface operations {
     deduct: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Idempotency key for safe retries; equivalent to the body's idempotency_key field (the body wins when both are sent). */
+                "Idempotency-Key"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -3274,7 +3289,10 @@ export interface operations {
     record: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Idempotency key for safe retries; equivalent to the body's idempotency_key field (the body wins when both are sent). */
+                "Idempotency-Key"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -3307,7 +3325,10 @@ export interface operations {
     recordInBatch: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Idempotency key for safe retries; equivalent to the body's idempotency_key field (the body wins when both are sent). */
+                "Idempotency-Key"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };

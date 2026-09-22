@@ -13,7 +13,7 @@
  * 
  * Prerequisites:
  *   1. Start the API — make dev-d && make dev-migrate (from repo root)
- *   2. Register — POST http://127.0.0.1:8000/api/v1/auth/registration
+ *   2. Register — POST http://127.0.0.1:8000/api/v1/auth/registration { "email", "password", "first_name", "last_name", "organization_name" }
  *   3. Login — POST http://127.0.0.1:8000/api/v1/auth/login → copy access_token
  *   4. Get org id — GET http://127.0.0.1:8000/api/v1/organizations → copy id
  *   5. Create a project — POST /api/v1/organizations/{org_id}/projects → copy id
@@ -23,8 +23,10 @@
  *
  */
 
-import { MeterFlow } from "../dist/index";
-import { verifyWebhook } from "../dist/webhook";
+// Self-referencing package imports — resolved through package.json's `exports` map
+// to the built dist files, exactly like a consumer's `import from "meterflow"`.
+import { MeterFlow } from "meterflow";
+import { verifyWebhook } from "meterflow/webhook";
 import { createHmac } from "crypto";
 
 const apiKey = process.env["METERFLOW_API_KEY"];
