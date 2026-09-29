@@ -19,6 +19,13 @@ describe("public index exports", () => {
     expect(new MeterFlow({ apiKey: "mf_test_x" })).toBeInstanceOf(MeterFlow);
   });
 
+  it("exposes the five SDK-facing resources", () => {
+    const client = new MeterFlow({ apiKey: "mf_test_x" });
+    for (const resource of ["credits", "usage", "subscriptions", "plans", "entitlements"] as const) {
+      expect(client[resource]).toBeDefined();
+    }
+  });
+
   it("exports all error classes", () => {
     expect(MeterFlowError).toBeDefined();
     expect(AuthError).toBeDefined();

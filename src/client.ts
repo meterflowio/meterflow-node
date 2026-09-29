@@ -3,6 +3,7 @@ import { CreditsResource } from "./resources/credits";
 import { UsageResource } from "./resources/usage";
 import { SubscriptionsResource } from "./resources/subscriptions";
 import { PlansResource } from "./resources/plans";
+import { EntitlementsResource } from "./resources/entitlements";
 
 export interface MeterFlowOptions {
   apiKey: string;
@@ -26,6 +27,7 @@ export class MeterFlow {
   private _usage?: UsageResource;
   private _subscriptions?: SubscriptionsResource;
   private _plans?: PlansResource;
+  private _entitlements?: EntitlementsResource;
 
   constructor(options: MeterFlowOptions) {
     if (!options.apiKey.startsWith("mf_live_") && !options.apiKey.startsWith("mf_test_")) {
@@ -56,6 +58,10 @@ export class MeterFlow {
 
   get plans(): PlansResource {
     return (this._plans ??= new PlansResource(this));
+  }
+
+  get entitlements(): EntitlementsResource {
+    return (this._entitlements ??= new EntitlementsResource(this));
   }
 
   /** @internal — used by resource classes only; not part of the public API */

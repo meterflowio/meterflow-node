@@ -23,6 +23,7 @@ Track what your customers use, enforce credit balances, and manage subscriptions
   - [Usage events](#usage-events)
   - [Subscriptions](#subscriptions)
   - [Plans](#plans)
+  - [Entitlements — ask before you act](#entitlements--ask-before-you-act)
 - [Idempotency — safe retries for writes](#idempotency--safe-retries-for-writes)
 - [Automatic retries](#automatic-retries)
 - [Error handling](#error-handling)
@@ -298,6 +299,38 @@ plan.meter_limits;   // included units + overage rate per meter
 
 Typical use: render your pricing page or signup flow from `plans.list()` so it can never drift from what billing actually enforces.
 
+### Entitlements — ask before you act
+
+The one call to make **before** doing work for a customer: "may they use this feature — and how much is left?" A **hard** limit says no here; recording usage afterwards never blocks, so an app that skips this call gets an honest ledger but no enforcement.
+
+```typescript
+const gate = await client.entitlements.check("customer_123", "images.generated");
+
+if (!gate.allowed) {
+  // gate.reason: "hard_limit_reached" | "no_subscription" | "not_in_plan" | "insufficient_credits"
+  return showUpgradePrompt(gate); // gate.used / gate.included / gate.period_end are there for the copy
+}
+
+await generateImage();
+await client.usage.record({ event_name: "images.generated", customer_external_id: "customer_123", value: 1, properties: {} });
+```
+
+- `feature` is a meter's `event_name` (metered — `included`, `used`, `remaining` filled in) or a plan feature key like `"sso"` (boolean).
+- `{ quantity: 5 }` asks "may they do **5** more?" — one call instead of one per item for batch work.
+- A **soft** limit answers `allowed: true` with `reason: "soft_limit_exceeded"` — let it through, nudge the upgrade.
+- A **metered** limit stays allowed while the customer's credits cover the overage; otherwise `insufficient_credits`.
+- `allowed: false` is a normal resolved answer, never an exception. A feature key the project does not know at all is a `NotFoundError` — that is a typo, not a plan.
+- The answer carries `Cache-Control: private, max-age=15`; on hot paths cache it per customer for a few seconds rather than calling on every request.
+
+**All of them at once** — for a settings or pricing screen:
+
+```typescript
+const { entitlements, period_end } = await client.entitlements.get("customer_123");
+// [{ feature: "sso", feature_type: "boolean", allowed: true }, { feature: "images.generated", feature_type: "metered", used: "120", included: 500, remaining: "380", ... }]
+```
+
+Prefer to be told rather than to ask? Subscribe a webhook to `limit.reached` (see below).
+
 ## Idempotency — safe retries for writes
 
 Connections drop. When your app can't tell whether a write arrived, the correct move is to send it again **with the same idempotency key** — MeterFlow recognises the key and acts only once:
@@ -367,7 +400,7 @@ try {
 
 ## Verifying webhooks
 
-MeterFlow notifies your app of activity you'd otherwise poll for — credits granted or deducted, usage recorded, subscriptions created or updated. Every delivery is signed with **HMAC-SHA256** in the `X-MeterFlow-Signature` header, using the webhook's secret — verify before trusting:
+MeterFlow notifies your app of activity you'd otherwise poll for — credits granted or deducted, usage recorded, subscriptions created or updated, a customer reaching a plan limit. Every delivery is signed with **HMAC-SHA256** in the `X-MeterFlow-Signature` header, using the webhook's secret — verify before trusting:
 
 ```typescript
 import express from "express";
@@ -406,6 +439,7 @@ Every delivery is a flat JSON object (`Content-Type: application/json`) with two
 | `credit.deducted` | credits are deducted | `customer_id`, `amount`, `balance_after`, `transaction_id` |
 | `subscription.created` | a subscription is created | `customer_id`, `plan_id`, `subscription_id`, `status` |
 | `subscription.updated` | a subscription is updated | `customer_id`, `subscription_id`, `status` |
+| `limit.reached` | a customer first reaches a **hard** or **soft** limit's included units this billing period (once per meter per period; metered limits report through `credit.deducted` instead) | `customer_id`, `subscription_id`, `feature` (the meter's `event_name`), `meter_id`, `limit_type`, `included`, `used`, `period_start`, `period_end` |
 
 For example, a `credit.granted` delivery:
 
