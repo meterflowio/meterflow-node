@@ -158,6 +158,23 @@ export interface paths {
         patch: operations["update"];
         trace?: never;
     };
+    "/api/v1/users/me/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the current user's platform-plan limits (owned organizations, projects per organization) */
+        get: operations["limits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations": {
         parameters: {
             query?: never;
@@ -192,6 +209,23 @@ export interface paths {
         head?: never;
         /** Update organization */
         patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the organization's platform-plan limits */
+        get: operations["limits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/organizations/{org_id}/members": {
@@ -690,6 +724,125 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/billing/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The platform-tier catalog (public) */
+        get: operations["plans"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public provider config for the checkout overlay */
+        get: operations["getConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/organizations/{org_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Billing state of an organization */
+        get: operations["state"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start a checkout for a paid tier */
+        post: operations["checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/change-plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upgrade, downgrade or cancel an active subscription */
+        post: operations["changePlan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/portal-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Signed link to the provider's customer portal (invoices, payment method) */
+        post: operations["portalSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/webhooks/paddle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Inbound Paddle notifications (signature-verified) */
+        post: operations["paddleWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -854,10 +1007,98 @@ export interface components {
             revoked_at: string | null;
         };
         /**
+         * BillingConfigResponse
+         * @description What the dashboard needs to open the provider's checkout overlay. All values are public.
+         */
+        BillingConfigResponse: {
+            /** Provider */
+            provider: string;
+            /** Environment */
+            environment: string;
+            /** Client Token */
+            client_token: string;
+            prices: components["schemas"]["BillingPrices"];
+            /** Configured */
+            configured: boolean;
+        };
+        /**
          * BillingPeriod
          * @enum {string}
          */
         BillingPeriod: "monthly" | "yearly" | "weekly" | "one_time";
+        /**
+         * BillingPrices
+         * @description Provider price ids per paid tier (differ between the sandbox and live catalogs).
+         */
+        BillingPrices: {
+            /** Flow */
+            flow: string;
+            /** Stream */
+            stream: string;
+            /** Torrent */
+            torrent: string;
+        };
+        /** BillingStateResponse */
+        BillingStateResponse: {
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /** Tier */
+            tier: string;
+            /** Billing Status */
+            billing_status: string;
+            /** Has Subscription */
+            has_subscription: boolean;
+            /** Price Id */
+            price_id?: string | null;
+            /** Current Period End */
+            current_period_end?: string | null;
+            /** Cancel Effective At */
+            cancel_effective_at?: string | null;
+        };
+        /**
+         * ChangePlanRequest
+         * @description Move an already-subscribed org to another tier; `drip` schedules a cancel at period end.
+         */
+        ChangePlanRequest: {
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Tier
+             * @enum {string}
+             */
+            tier: "drip" | "flow" | "stream" | "torrent";
+        };
+        /** CheckoutRequest */
+        CheckoutRequest: {
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Tier
+             * @enum {string}
+             */
+            tier: "flow" | "stream" | "torrent";
+        };
+        /**
+         * CheckoutResponse
+         * @description The dashboard opens `transaction_id` with Paddle.js: Paddle.Checkout.open({ transactionId }).
+         */
+        CheckoutResponse: {
+            /** Transaction Id */
+            transaction_id: string;
+            /** Client Token */
+            client_token: string;
+            /** Environment */
+            environment: string;
+        };
         /** CreditBalanceResponse */
         CreditBalanceResponse: {
             /**
@@ -1124,12 +1365,58 @@ export interface components {
              */
             joined_at: string;
         };
+        /**
+         * OrgProjectUsage
+         * @description Active projects vs the cap of one organization the user belongs to (any role).
+         */
+        OrgProjectUsage: {
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /** Tier */
+            tier: string;
+            /** Projects Active */
+            projects_active: number;
+            /** Projects Allowed */
+            projects_allowed: number;
+        };
         /** OrganizationCreateRequest */
         OrganizationCreateRequest: {
             /** Name */
             name: string;
             /** Billing Email */
             billing_email?: string | null;
+        };
+        /**
+         * OrganizationLimitsResponse
+         * @description An organization's current caps plus how much of each it uses today.
+         */
+        OrganizationLimitsResponse: {
+            /** Tier */
+            tier: string;
+            /** Display Name */
+            display_name: string;
+            /** Events Per Month */
+            events_per_month: number;
+            /** Orgs Per User */
+            orgs_per_user: number;
+            /** Projects */
+            projects: number;
+            /** Meters Per Project */
+            meters_per_project: number;
+            /** Team Seats */
+            team_seats: number;
+            /** Api Keys Per Project */
+            api_keys_per_project: number;
+            /** Webhook Endpoints */
+            webhook_endpoints: number;
+            /** Analytics Retention Days */
+            analytics_retention_days: number;
+            usage: components["schemas"]["OrganizationUsageResponse"];
+            /** Billing Status */
+            billing_status: string;
         };
         /** OrganizationResponse */
         OrganizationResponse: {
@@ -1160,6 +1447,24 @@ export interface components {
             name?: string | null;
             /** Billing Email */
             billing_email?: string | null;
+        };
+        /**
+         * OrganizationUsageResponse
+         * @description Live counts against the caps — computed by `billing.entitlements.organization_usage`,
+         *     the same counters the 403 gates use. Meters and live keys come per project; webhooks report
+         *     the busiest project.
+         */
+        OrganizationUsageResponse: {
+            /** Events This Month */
+            events_this_month: number;
+            /** Projects Active */
+            projects_active: number;
+            /** Team Seats */
+            team_seats: number;
+            /** Projects */
+            projects: components["schemas"]["ProjectUsageResponse"][];
+            /** Webhook Endpoints */
+            webhook_endpoints: number;
         };
         /** PasswordResetConfirm */
         PasswordResetConfirm: {
@@ -1325,6 +1630,39 @@ export interface components {
             } | null;
         };
         /**
+         * PlatformPlanResponse
+         * @description One entry of the platform-tier catalog (the plan picker). Extends the limits shape
+         *     with what a buyer needs to choose: the price and the provider price id (None for Drip).
+         */
+        PlatformPlanResponse: {
+            /** Tier */
+            tier: string;
+            /** Display Name */
+            display_name: string;
+            /** Events Per Month */
+            events_per_month: number;
+            /** Orgs Per User */
+            orgs_per_user: number;
+            /** Projects */
+            projects: number;
+            /** Meters Per Project */
+            meters_per_project: number;
+            /** Team Seats */
+            team_seats: number;
+            /** Api Keys Per Project */
+            api_keys_per_project: number;
+            /** Webhook Endpoints */
+            webhook_endpoints: number;
+            /** Analytics Retention Days */
+            analytics_retention_days: number;
+            /** Monthly Price Usd */
+            monthly_price_usd: number;
+            /** Support */
+            support: string;
+            /** Price Id */
+            price_id?: string | null;
+        };
+        /**
          * PlatformStatsResponse
          * @description Platform-wide totals for the super-admin overview.
          */
@@ -1347,6 +1685,19 @@ export interface components {
             total_credits_granted: string;
             /** Total Credits Deducted */
             total_credits_deducted: string;
+        };
+        /** PortalSessionRequest */
+        PortalSessionRequest: {
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+        };
+        /** PortalSessionResponse */
+        PortalSessionResponse: {
+            /** Url */
+            url: string;
         };
         /** ProjectCreateRequest */
         ProjectCreateRequest: {
@@ -1390,6 +1741,20 @@ export interface components {
             /** Is Active */
             is_active?: boolean | null;
         };
+        /** ProjectUsageResponse */
+        ProjectUsageResponse: {
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Project Name */
+            project_name: string;
+            /** Meters Active */
+            meters_active: number;
+            /** Api Keys Active */
+            api_keys_active: number;
+        };
         /** RegistrationRequest */
         RegistrationRequest: {
             /**
@@ -1405,6 +1770,8 @@ export interface components {
             last_name: string;
             /** Organization Name */
             organization_name?: string | null;
+            /** Accepted Terms */
+            accepted_terms: boolean;
         };
         /** RevenueAnalyticsResponse */
         RevenueAnalyticsResponse: {
@@ -1693,6 +2060,22 @@ export interface components {
             /** Meters */
             meters: components["schemas"]["UsageSummaryItem"][];
         };
+        /**
+         * UserLimitsResponse
+         * @description Account-level caps for the dashboard's overview counters.
+         *
+         *     Organization ownership is a per-USER cap (from the most permissive owned tier —
+         *     the same rule `ensure_org_quota` enforces); projects are capped per ORGANIZATION,
+         *     so they are reported per org and the client sums them for a total.
+         */
+        UserLimitsResponse: {
+            /** Organizations Owned */
+            organizations_owned: number;
+            /** Organizations Allowed */
+            organizations_allowed: number;
+            /** Organizations */
+            organizations: components["schemas"]["OrgProjectUsage"][];
+        };
         /** UserResponse */
         UserResponse: {
             /**
@@ -1747,6 +2130,19 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** WebhookAckResponse */
+        WebhookAckResponse: {
+            /**
+             * Received
+             * @default true
+             */
+            received: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "processed" | "ignored" | "duplicate";
         };
         /** WebhookCreateRequest */
         WebhookCreateRequest: {
@@ -2213,6 +2609,26 @@ export interface operations {
             };
         };
     };
+    limits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserLimitsResponse"];
+                };
+            };
+        };
+    };
     list: {
         parameters: {
             query?: never;
@@ -2319,6 +2735,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OrganizationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    limits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationLimitsResponse"];
                 };
             };
             /** @description Validation Error */
@@ -3731,6 +4178,208 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminUserResponse"][];
+                };
+            };
+        };
+    };
+    plans: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformPlanResponse"][];
+                };
+            };
+        };
+    };
+    getConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingConfigResponse"];
+                };
+            };
+        };
+    };
+    state: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingStateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    checkout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    changePlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePlanRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingStateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    portalSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PortalSessionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalSessionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    paddleWebhook: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description `ts=<unix>;h1=<hex>` — HMAC-SHA256 over `ts:body`. */
+                "Paddle-Signature"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebhookAckResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

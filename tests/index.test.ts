@@ -6,9 +6,11 @@ import {
   NotFoundError,
   InsufficientCreditsError,
   ConflictError,
+  PayloadTooLargeError,
   ValidationError,
   RateLimitError,
   ServerError,
+  MAX_BATCH_EVENTS,
 } from "../src/index";
 
 describe("public index exports", () => {
@@ -23,8 +25,13 @@ describe("public index exports", () => {
     expect(NotFoundError).toBeDefined();
     expect(InsufficientCreditsError).toBeDefined();
     expect(ConflictError).toBeDefined();
+    expect(PayloadTooLargeError).toBeDefined();
     expect(ValidationError).toBeDefined();
     expect(RateLimitError).toBeDefined();
     expect(ServerError).toBeDefined();
+  });
+
+  it("exports the batch cap so callers can chunk against the number the SDK enforces", () => {
+    expect(MAX_BATCH_EVENTS).toBe(500);
   });
 });

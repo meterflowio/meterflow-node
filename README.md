@@ -212,6 +212,17 @@ await client.usage.recordBatch([
 ]);
 ```
 
+A batch holds at most **500 events** (exported as `MAX_BATCH_EVENTS`). A larger array is rejected locally with `PayloadTooLargeError` before anything is sent — the SDK deliberately does **not** split it for you, because one call is one request with one idempotency key, and turning it into several would make a partial failure indistinguishable from success. Chunk at the call site and give each chunk its own key:
+
+```typescript
+import { MAX_BATCH_EVENTS } from "meterflow";
+
+for (let i = 0; i < events.length; i += MAX_BATCH_EVENTS) {
+  const chunk = events.slice(i, i + MAX_BATCH_EVENTS);
+  await client.usage.recordBatch(chunk, { idempotencyKey: `job-42:chunk-${i / MAX_BATCH_EVENTS}` });
+}
+```
+
 **Summary** — a customer's usage, broken down by meter:
 
 ```typescript
@@ -324,7 +335,8 @@ Every non-2xx response is thrown as a typed error. All of them extend `MeterFlow
 | `InsufficientCreditsError` | 402 | `insufficient_credits` | no |
 | `NotFoundError` | 404 | `not_found` | no |
 | `ConflictError` | 409 | `conflict` | no |
-| `ValidationError` | 422 | `validation_error` | no |
+| `PayloadTooLargeError` | 413 | `payload_too_large` | no — split the batch (see `MAX_BATCH_EVENTS`) |
+| `ValidationError` | 422 | `validation_error` | no — per-field detail in `.fields` |
 | `RateLimitError` | 429 | `rate_limit` | yes (honours `Retry-After`, exposed as `.retryAfter`) |
 | `ServerError` | 5xx | `server_error` | yes |
 
@@ -332,6 +344,7 @@ Every error carries:
 
 - **`requestId`** — the API's `X-Request-ID` for that call. Include it when contacting support; it pinpoints the exact request in our logs.
 - **`statusCode`**, **`errorType`**, and **`retryable`** — for programmatic handling and structured logging.
+- **`message`** — the API's own sentence (e.g. `Plan limit reached: the Drip plan includes 5,000 usage events per month…`). A `ValidationError` appends its field detail (`Validation failed: amount: must be greater than 0`) and also exposes it structured as **`.fields`** (`{ field, message }[]`).
 
 ```typescript
 import { MeterFlowError, InsufficientCreditsError, RateLimitError } from "meterflow";

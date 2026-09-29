@@ -8,7 +8,10 @@ export {
   NotFoundError,
   InsufficientCreditsError,
   ConflictError,
+  PayloadTooLargeError,
   ValidationError,
   RateLimitError,
   ServerError,
+  type ValidationFieldError,
 } from "./errors";
+export { MAX_BATCH_EVENTS } from "./resources/usage";

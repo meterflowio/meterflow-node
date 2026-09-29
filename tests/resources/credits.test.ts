@@ -79,26 +79,26 @@ describe("credits.grant", () => {
   });
 
   it("throws AuthError on 401", async () => {
-    server.use(http.post(`${BASE}/credits/grant`, () => HttpResponse.json({ detail: "Unauthorized" }, { status: 401 })));
+    server.use(http.post(`${BASE}/credits/grant`, () => HttpResponse.json({ error: { code: 401, message: "Unauthorized" } }, { status: 401 })));
     await expect(makeClient().credits.grant({ amount: 10, customer_external_id: "c", metadata: {} })).rejects.toBeInstanceOf(AuthError);
   });
 
   it("throws InsufficientCreditsError on 402", async () => {
-    server.use(http.post(`${BASE}/credits/deduct`, () => HttpResponse.json({ detail: "Insufficient credits" }, { status: 402 })));
+    server.use(http.post(`${BASE}/credits/deduct`, () => HttpResponse.json({ error: { code: 402, message: "Insufficient credits" } }, { status: 402 })));
     await expect(makeClient().credits.deduct({ amount: 999, customer_external_id: "c", metadata: {} })).rejects.toBeInstanceOf(
       InsufficientCreditsError,
     );
   });
 
   it("throws ValidationError on 422", async () => {
-    server.use(http.post(`${BASE}/credits/grant`, () => HttpResponse.json({ detail: "invalid" }, { status: 422 })));
+    server.use(http.post(`${BASE}/credits/grant`, () => HttpResponse.json({ error: { code: 422, message: "invalid" } }, { status: 422 })));
     await expect(makeClient().credits.grant({ amount: 0, customer_external_id: "c", metadata: {} })).rejects.toBeInstanceOf(ValidationError);
   });
 
   it("error carries requestId from X-Request-ID header", async () => {
     server.use(
       http.post(`${BASE}/credits/grant`, () =>
-        HttpResponse.json({ detail: "err" }, { status: 401, headers: { "x-request-id": "req-xyz" } }),
+        HttpResponse.json({ error: { code: 401, message: "err" } }, { status: 401, headers: { "x-request-id": "req-xyz" } }),
       ),
     );
     const err = await makeClient()
@@ -141,7 +141,7 @@ describe("credits.balance", () => {
   });
 
   it("throws NotFoundError on 404", async () => {
-    server.use(http.get(`${BASE}/credits/unknown/balance`, () => HttpResponse.json({ detail: "not found" }, { status: 404 })));
+    server.use(http.get(`${BASE}/credits/unknown/balance`, () => HttpResponse.json({ error: { code: 404, message: "not found" } }, { status: 404 })));
     await expect(makeClient().credits.balance("unknown")).rejects.toBeInstanceOf(NotFoundError);
   });
 });
@@ -185,7 +185,7 @@ describe("error mapping", () => {
   it("RateLimitError exposes retryAfter", async () => {
     server.use(
       http.post(`${BASE}/credits/grant`, () =>
-        HttpResponse.json({ detail: "rate limited" }, { status: 429, headers: { "Retry-After": "30", "x-request-id": "r" } }),
+        HttpResponse.json({ error: { code: 429, message: "rate limited" } }, { status: 429, headers: { "Retry-After": "30", "x-request-id": "r" } }),
       ),
     );
     const err = await makeClient()

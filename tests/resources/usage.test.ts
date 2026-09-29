@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { MeterFlow } from "../../src/client";
+import { MAX_BATCH_EVENTS, PayloadTooLargeError } from "../../src/index";
 
 const BASE = "https://api.meter-flow.com/api/v1";
 const server = setupServer();
@@ -114,5 +115,32 @@ describe("usage.summary", () => {
     expect(url.searchParams.get("meter_id")).toBe("m-1");
     expect(url.searchParams.get("from_")).toBe("2026-01-01");
     expect(url.searchParams.get("to")).toBe("2026-01-31");
+  });
+});
+
+describe("usage.recordBatch size cap", () => {
+  const event = { event_name: "api_call", customer_external_id: "c", quantity: 1 };
+
+  it("sends exactly MAX_BATCH_EVENTS events", async () => {
+    let received = 0;
+    server.use(
+      http.post(`${BASE}/usage/events/batch`, async ({ request }) => {
+        received = ((await request.json()) as { events: unknown[] }).events.length;
+        return HttpResponse.json([EVENT_RESPONSE], { status: 201 });
+      }),
+    );
+    await makeClient().usage.recordBatch(Array.from({ length: MAX_BATCH_EVENTS }, () => event));
+    expect(received).toBe(MAX_BATCH_EVENTS);
+  });
+
+  it("rejects one more locally with PayloadTooLargeError — no request is made", async () => {
+    // onUnhandledRequest: "error" — if the SDK sent this, msw would fail the test.
+    const err = await makeClient()
+      .usage.recordBatch(Array.from({ length: MAX_BATCH_EVENTS + 1 }, () => event))
+      .catch((e) => e);
+    expect(err).toBeInstanceOf(PayloadTooLargeError);
+    expect(err.message).toContain(String(MAX_BATCH_EVENTS));
+    expect(err.message).toContain(String(MAX_BATCH_EVENTS + 1));
+    expect(err.retryable).toBe(false);
   });
 });

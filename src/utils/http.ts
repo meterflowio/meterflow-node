@@ -1,17 +1,23 @@
 import type { MeterFlowOptions, RequestOptions } from "../client";
+import { version as PACKAGE_VERSION } from "../../package.json";
 import {
   MeterFlowError,
   AuthError,
   NotFoundError,
   InsufficientCreditsError,
   ConflictError,
+  PayloadTooLargeError,
   ValidationError,
   RateLimitError,
   ServerError,
+  type ValidationFieldError,
 } from "../errors";
 import { retryable } from "./retry";
 
-const SDK_VERSION = "0.2.0";
+// Read from package.json at build time (esbuild inlines it), so the release script's
+// `npm version` bump is the only place the number lives. It was a hand-maintained literal
+// before and had been reporting 0.2.0 for two releases.
+const SDK_VERSION: string = PACKAGE_VERSION;
 
 function buildUrl(baseUrl: string, path: string, query?: Record<string, string | number | boolean>): string {
   const url = new URL(path, baseUrl.endsWith("/") ? baseUrl : baseUrl + "/");
@@ -38,22 +44,48 @@ function buildHeaders(options: Required<MeterFlowOptions>, opts?: RequestOptions
   return headers;
 }
 
-async function parseErrorBody(response: Response): Promise<string> {
+interface ParsedError {
+  message: string;
+  fields: ValidationFieldError[];
+}
+
+function isFieldError(value: unknown): value is ValidationFieldError {
+  return typeof value === "object" && value !== null && typeof (value as ValidationFieldError).field === "string" && typeof (value as ValidationFieldError).message === "string";
+}
+
+/**
+ * The MeterFlow API answers every error as `{ error: { code, message, fields? } }`
+ * (app/api/src/exceptions.py). `detail` is FastAPI's default shape, kept only as a fallback so
+ * an unexpected passthrough still yields a readable message rather than a JSON blob.
+ */
+async function parseErrorBody(response: Response): Promise<ParsedError> {
   try {
     const json = (await response.json()) as Record<string, unknown>;
-    if (typeof json["detail"] === "string") return json["detail"];
-    return JSON.stringify(json);
+    const error = json["error"];
+    if (typeof error === "object" && error !== null) {
+      const body = error as Record<string, unknown>;
+      const fields = Array.isArray(body["fields"]) ? body["fields"].filter(isFieldError) : [];
+      if (typeof body["message"] === "string") {
+        // A 422's headline is always "Validation failed"; the field list is what the caller needs.
+        const detail = fields.map((f) => `${f.field}: ${f.message}`).join("; ");
+        return { message: detail ? `${body["message"]}: ${detail}` : body["message"], fields };
+      }
+    }
+    if (typeof json["detail"] === "string") return { message: json["detail"], fields: [] };
+    return { message: JSON.stringify(json), fields: [] };
   } catch {
-    return response.statusText || `HTTP ${response.status}`;
+    return { message: response.statusText || `HTTP ${response.status}`, fields: [] };
   }
 }
 
-function mapResponseError(status: number, message: string, requestId: string | undefined, response: Response): MeterFlowError {
+function mapResponseError(status: number, parsed: ParsedError, requestId: string | undefined, response: Response): MeterFlowError {
+  const { message, fields } = parsed;
   if (status === 401 || status === 403) return new AuthError(message, requestId, status);
   if (status === 402) return new InsufficientCreditsError(message, requestId);
   if (status === 404) return new NotFoundError(message, requestId);
   if (status === 409) return new ConflictError(message, requestId);
-  if (status === 422) return new ValidationError(message, requestId);
+  if (status === 413) return new PayloadTooLargeError(message, requestId);
+  if (status === 422) return new ValidationError(message, requestId, fields);
   if (status === 429) {
     const retryAfterRaw = response.headers.get("Retry-After");
     const retryAfter = retryAfterRaw != null ? parseInt(retryAfterRaw, 10) : undefined;
@@ -84,8 +116,8 @@ export async function httpRequest<T>(
       const requestId = response.headers.get("x-request-id") ?? undefined;
 
       if (!response.ok) {
-        const message = await parseErrorBody(response);
-        throw mapResponseError(response.status, message, requestId, response);
+        const parsed = await parseErrorBody(response);
+        throw mapResponseError(response.status, parsed, requestId, response);
       }
 
       if (response.status === 204 || response.headers.get("content-length") === "0") {

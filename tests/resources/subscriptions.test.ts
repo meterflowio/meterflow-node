@@ -58,7 +58,7 @@ describe("subscriptions.create", () => {
   });
 
   it("throws ConflictError on 409", async () => {
-    server.use(http.post(`${BASE}/subscriptions`, () => HttpResponse.json({ detail: "already exists" }, { status: 409 })));
+    server.use(http.post(`${BASE}/subscriptions`, () => HttpResponse.json({ error: { code: 409, message: "already exists" } }, { status: 409 })));
     await expect(makeClient().subscriptions.create({ customer_external_id: "c", plan_id: "p", metadata: {} })).rejects.toBeInstanceOf(
       ConflictError,
     );
@@ -94,7 +94,7 @@ describe("subscriptions.get", () => {
   });
 
   it("throws NotFoundError on 404", async () => {
-    server.use(http.get(`${BASE}/subscriptions/missing`, () => HttpResponse.json({ detail: "not found" }, { status: 404 })));
+    server.use(http.get(`${BASE}/subscriptions/missing`, () => HttpResponse.json({ error: { code: 404, message: "not found" } }, { status: 404 })));
     await expect(makeClient().subscriptions.get("missing")).rejects.toBeInstanceOf(NotFoundError);
   });
 });

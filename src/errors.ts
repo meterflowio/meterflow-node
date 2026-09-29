@@ -42,10 +42,31 @@ export class ConflictError extends MeterFlowError {
   }
 }
 
+/** One field the API rejected, as returned in a 422's `error.fields`. */
+export interface ValidationFieldError {
+  field: string;
+  message: string;
+}
+
 export class ValidationError extends MeterFlowError {
-  constructor(message: string, requestId?: string) {
+  /** Per-field detail from the API. Empty when the 422 carried none. */
+  readonly fields: ValidationFieldError[];
+
+  constructor(message: string, requestId?: string, fields: ValidationFieldError[] = []) {
     super(message, "validation_error", false, requestId, 422);
     this.name = "ValidationError";
+    this.fields = fields;
+  }
+}
+
+/**
+ * The request was well-formed but too large — today only `usage.recordBatch` with more than
+ * `MAX_BATCH_EVENTS` events. Never retried: the same payload would be refused again. Split it.
+ */
+export class PayloadTooLargeError extends MeterFlowError {
+  constructor(message: string, requestId?: string) {
+    super(message, "payload_too_large", false, requestId, 413);
+    this.name = "PayloadTooLargeError";
   }
 }
 

@@ -89,7 +89,7 @@ describe("plans.get", () => {
   });
 
   it("throws NotFoundError on 404", async () => {
-    server.use(http.get(`${BASE}/plans/missing`, () => HttpResponse.json({ detail: "not found" }, { status: 404 })));
+    server.use(http.get(`${BASE}/plans/missing`, () => HttpResponse.json({ error: { code: 404, message: "not found" } }, { status: 404 })));
     await expect(makeClient().plans.get("missing")).rejects.toBeInstanceOf(NotFoundError);
   });
 });

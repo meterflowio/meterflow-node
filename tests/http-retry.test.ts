@@ -32,7 +32,7 @@ describe("retry on 5xx", () => {
     server.use(
       http.post(`${BASE}/credits/grant`, () => {
         calls++;
-        if (calls === 1) return HttpResponse.json({ detail: "down" }, { status: 503 });
+        if (calls === 1) return HttpResponse.json({ error: { code: 503, message: "down" } }, { status: 503 });
         return HttpResponse.json(TX, { status: 201 });
       }),
     );
@@ -49,7 +49,7 @@ describe("retry on 5xx", () => {
     server.use(
       http.post(`${BASE}/credits/grant`, () => {
         calls++;
-        return HttpResponse.json({ detail: "down" }, { status: 500 });
+        return HttpResponse.json({ error: { code: 500, message: "down" } }, { status: 500 });
       }),
     );
 
@@ -66,7 +66,7 @@ describe("no retry on 4xx", () => {
     server.use(
       http.post(`${BASE}/credits/grant`, () => {
         calls++;
-        return HttpResponse.json({ detail: "bad input" }, { status: 422 });
+        return HttpResponse.json({ error: { code: 422, message: "bad input" } }, { status: 422 });
       }),
     );
 
@@ -80,7 +80,7 @@ describe("no retry on 4xx", () => {
     server.use(
       http.post(`${BASE}/credits/grant`, () => {
         calls++;
-        return HttpResponse.json({ detail: "unauthorized" }, { status: 401 });
+        return HttpResponse.json({ error: { code: 401, message: "unauthorized" } }, { status: 401 });
       }),
     );
 
@@ -97,7 +97,7 @@ describe("429 honours Retry-After", () => {
       http.post(`${BASE}/credits/grant`, () => {
         calls++;
         if (calls === 1) {
-          return HttpResponse.json({ detail: "rate limited" }, { status: 429, headers: { "Retry-After": "1", "x-request-id": "r" } });
+          return HttpResponse.json({ error: { code: 429, message: "rate limited" } }, { status: 429, headers: { "Retry-After": "1", "x-request-id": "r" } });
         }
         return HttpResponse.json(TX, { status: 201 });
       }),
@@ -112,7 +112,7 @@ describe("429 honours Retry-After", () => {
   it("exposes retryAfter on the thrown RateLimitError when retries=0", async () => {
     server.use(
       http.post(`${BASE}/credits/grant`, () =>
-        HttpResponse.json({ detail: "rate limited" }, { status: 429, headers: { "Retry-After": "60", "x-request-id": "r" } }),
+        HttpResponse.json({ error: { code: 429, message: "rate limited" } }, { status: 429, headers: { "Retry-After": "60", "x-request-id": "r" } }),
       ),
     );
 

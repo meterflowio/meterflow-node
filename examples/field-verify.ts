@@ -1,8 +1,8 @@
 /**
  * MeterFlow Node.js SDK — Field verification harness
  *
- * The pre-publish verification list (PROJECT_STRUCTURE.md → "Verification before publishing either SDK"
- * + Next Steps #10), runnable against a real deployment — designed for the VPS field test where the
+ * The pre-publish verification list (docs/ROADMAP.md → "SDK release verification"; the 2026-09-18 VPS pass
+ * is logged in docs/DECISIONS.md), runnable against a real deployment — designed for the VPS field test where the
  * network is real, the rate limiter is live, and the data environment is selected by the key prefix.
  *
  * Use an `mf_test_*` key: every write lands in the isolated test environment, so a production

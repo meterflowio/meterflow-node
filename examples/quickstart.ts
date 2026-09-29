@@ -13,7 +13,7 @@
  * 
  * Prerequisites:
  *   1. Start the API — make dev-d && make dev-migrate (from repo root)
- *   2. Register — POST http://127.0.0.1:8000/api/v1/auth/registration { "email", "password", "first_name", "last_name", "organization_name" }
+ *   2. Register — POST http://127.0.0.1:8000/api/v1/auth/registration { "email", "password", "first_name", "last_name", "organization_name", "accepted_terms": true }
  *   3. Login — POST http://127.0.0.1:8000/api/v1/auth/login → copy access_token
  *   4. Get org id — GET http://127.0.0.1:8000/api/v1/organizations → copy id
  *   5. Create a project — POST /api/v1/organizations/{org_id}/projects → copy id
