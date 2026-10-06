@@ -144,3 +144,55 @@ describe("usage.recordBatch size cap", () => {
     expect(err.retryable).toBe(false);
   });
 });
+
+describe("usage.event", () => {
+  it("GET /usage/events/{id} with the id encoded in the path", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${BASE}/usage/events/:eventId`, ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json({ ...EVENT_RESPONSE, processed: true, billing_outcome: "no_subscription" });
+      }),
+    );
+
+    const event = await makeClient().usage.event("evt-1");
+
+    expect(capturedUrl).toBe(`${BASE}/usage/events/evt-1`);
+    expect(event.processed).toBe(true);
+  });
+
+  it("carries billing_outcome through, so a caller learns why nothing was charged", async () => {
+    server.use(
+      http.get(`${BASE}/usage/events/evt-1`, () =>
+        HttpResponse.json({ ...EVENT_RESPONSE, processed: true, billing_outcome: "within_allowance" }),
+      ),
+    );
+
+    const event = await makeClient().usage.event("evt-1");
+
+    expect(event.billing_outcome).toBe("within_allowance");
+  });
+
+  it("leaves billing_outcome null while the worker has not run", async () => {
+    server.use(http.get(`${BASE}/usage/events/evt-1`, () => HttpResponse.json({ ...EVENT_RESPONSE, billing_outcome: null })));
+
+    const event = await makeClient().usage.event("evt-1");
+
+    expect(event.processed).toBe(false);
+    expect(event.billing_outcome).toBeNull();
+  });
+
+  it("encodes an id that needs it rather than splitting the path", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${BASE}/usage/events/:eventId`, ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json(EVENT_RESPONSE);
+      }),
+    );
+
+    await makeClient().usage.event("evt/1");
+
+    expect(capturedUrl).toBe(`${BASE}/usage/events/evt%2F1`);
+  });
+});

@@ -48,6 +48,16 @@ export class UsageResource {
     });
   }
 
+  /**
+   * Read one recorded event back, including `billing_outcome` — what the worker decided to bill
+   * for it, or why it billed nothing (`no_subscription`, `no_meter_limit`, `not_metered`,
+   * `within_allowance`, `not_deducted`). It is `null` while `processed` is false: the worker runs
+   * after `record` answers, so poll this when you need to know what happened to a charge.
+   */
+  event(eventId: string): Promise<UsageEventResponse> {
+    return this.client.request<UsageEventResponse>("GET", `usage/events/${encodeURIComponent(eventId)}`);
+  }
+
   summary(customerId: string, query?: SummaryQuery): Promise<UsageSummaryResponse> {
     return this.client.request<UsageSummaryResponse>("GET", `usage/${encodeURIComponent(customerId)}`, {
       ...(query !== undefined && { query: query as Record<string, string | number | boolean> }),

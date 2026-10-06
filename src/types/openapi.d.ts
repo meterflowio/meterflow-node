@@ -11,8 +11,31 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Health Check */
+        /**
+         * Health Check
+         * @description Liveness: the process is up. Dependency-free on purpose — see services/health_service.py.
+         */
         get: operations["health_check_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Readiness Check
+         * @description Readiness: the database and Redis answer. 503 with the failing dependency named when they do not.
+         */
+        get: operations["readiness_check_health_ready_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -311,8 +334,10 @@ export interface paths {
         put?: never;
         /**
          * Issue a dashboard SDK session key
-         * @description Mint (rotating) an ephemeral mf_test_* key so the JWT-authenticated dashboard can drive the
-         *     API-key-only SDK endpoints (credits/usage/subscriptions) for this project.
+         * @description Mint (rotating) an ephemeral session key so the JWT-authenticated dashboard can drive the
+         *     API-key-only SDK endpoints (credits/usage/subscriptions) for this project. `environment`
+         *     (`live`, the default, or `test`) picks the data world the dashboard's Live / Test switch is on;
+         *     each environment keeps its own session key, so switching one does not revoke the other.
          */
         post: operations["issueDashboardKey"];
         delete?: never;
@@ -551,6 +576,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/usage/events/{event_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one recorded usage event, including what the worker decided to bill for it */
+        get: operations["getEvent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/usage/{customer_id}": {
         parameters: {
             query?: never;
@@ -629,7 +671,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Usage analytics — event counts and values over time, bucketed by granularity */
+        /** Usage analytics — event counts and values over time, bucketed by granularity, scoped to one data environment */
         get: operations["usage"];
         put?: never;
         post?: never;
@@ -646,7 +688,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Revenue analytics — credits granted/deducted over time, plus subscription status counts */
+        /** Revenue analytics — credits granted/deducted over time, plus subscription status counts, scoped to one data environment */
         get: operations["revenue"];
         put?: never;
         post?: never;
@@ -974,13 +1016,13 @@ export interface components {
         AggregationType: "count" | "sum" | "max" | "min" | "unique_count";
         /** ApiKeyCreateRequest */
         ApiKeyCreateRequest: {
-            /** Name */
-            name: string;
             /**
              * Environment
              * @default live
              */
             environment: string;
+            /** Name */
+            name: string;
         };
         /** ApiKeyCreateResponse */
         ApiKeyCreateResponse: {
@@ -1145,6 +1187,8 @@ export interface components {
              * Format: uuid
              */
             project_id: string;
+            /** Environment */
+            environment: string;
             /** Customer External Id */
             customer_external_id: string;
             /** Balance */
@@ -1214,6 +1258,8 @@ export interface components {
              * Format: uuid
              */
             project_id: string;
+            /** Environment */
+            environment: string;
             /** Customer External Id */
             customer_external_id: string;
             /** Transaction Type */
@@ -1237,6 +1283,17 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * DashboardSessionKeyRequest
+         * @description Body of the dashboard-session mint — which data world the dashboard wants to look at.
+         */
+        DashboardSessionKeyRequest: {
+            /**
+             * Environment
+             * @default live
+             */
+            environment: string;
         };
         /** EmailVerificationConfirm */
         EmailVerificationConfirm: {
@@ -1826,6 +1883,8 @@ export interface components {
         ProjectUpdateRequest: {
             /** Name */
             name?: string | null;
+            /** Slug */
+            slug?: string | null;
             /** Description */
             description?: string | null;
             /** Is Active */
@@ -1844,6 +1903,8 @@ export interface components {
             meters_active: number;
             /** Api Keys Active */
             api_keys_active: number;
+            /** Plans */
+            plans: number;
         };
         /** RegistrationRequest */
         RegistrationRequest: {
@@ -1872,6 +1933,8 @@ export interface components {
             project_id: string;
             /** Granularity */
             granularity: string;
+            /** Environment */
+            environment: string;
             /** From */
             from_: string | null;
             /** To */
@@ -1925,6 +1988,8 @@ export interface components {
              * Format: uuid
              */
             project_id: string;
+            /** Environment */
+            environment: string;
             /**
              * Plan Id
              * Format: uuid
@@ -2013,6 +2078,8 @@ export interface components {
             project_id: string;
             /** Granularity */
             granularity: string;
+            /** Environment */
+            environment: string;
             /** From */
             from_: string | null;
             /** To */
@@ -2072,6 +2139,8 @@ export interface components {
              * Format: uuid
              */
             project_id: string;
+            /** Environment */
+            environment: string;
             /**
              * Meter Id
              * Format: uuid
@@ -2091,6 +2160,10 @@ export interface components {
             idempotency_key: string | null;
             /** Processed */
             processed: boolean;
+            /** Billing Outcome */
+            billing_outcome?: string | null;
+            /** Processed At */
+            processed_at?: string | null;
             /**
              * Timestamp
              * Format: date-time
@@ -2410,7 +2483,31 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    readiness_check_health_ready_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -3148,7 +3245,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DashboardSessionKeyRequest"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             201: {
@@ -3895,6 +3996,37 @@ export interface operations {
             };
         };
     };
+    getEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageEventResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get: {
         parameters: {
             query?: {
@@ -4131,6 +4263,7 @@ export interface operations {
                 from_?: string | null;
                 to?: string | null;
                 granularity?: string;
+                environment?: string;
             };
             header?: never;
             path?: never;
@@ -4165,6 +4298,7 @@ export interface operations {
                 from_?: string | null;
                 to?: string | null;
                 granularity?: string;
+                environment?: string;
             };
             header?: never;
             path?: never;
