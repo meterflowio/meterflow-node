@@ -155,7 +155,7 @@ describe("credits.transactions", () => {
     expect(result[0]?.id).toBe("tx-1");
   });
 
-  it("passes query params when provided", async () => {
+  it("sends no query string — the endpoint returns the whole history in one response", async () => {
     let capturedUrl = "";
     server.use(
       http.get(`${BASE}/credits/cust-1/transactions`, ({ request }) => {
@@ -163,10 +163,23 @@ describe("credits.transactions", () => {
         return HttpResponse.json([TX_RESPONSE]);
       }),
     );
-    await makeClient().credits.transactions("cust-1", { page: 2, limit: 10 });
+    await makeClient().credits.transactions("cust-1");
     const url = new URL(capturedUrl);
-    expect(url.searchParams.get("page")).toBe("2");
-    expect(url.searchParams.get("limit")).toBe("10");
+    expect(url.search).toBe("");
+    expect([...url.searchParams.keys()]).toEqual([]);
+  });
+
+  it("encodes special characters in customerId", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${BASE}/credits/cust%401/transactions`, ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json([TX_RESPONSE]);
+      }),
+    );
+    await makeClient().credits.transactions("cust@1");
+    expect(capturedUrl).toContain("cust%401");
+    expect(new URL(capturedUrl).search).toBe("");
   });
 });
 

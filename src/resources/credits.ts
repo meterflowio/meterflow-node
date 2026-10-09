@@ -14,11 +14,6 @@ export interface DeductOptions {
   idempotencyKey?: string;
 }
 
-export interface TransactionsQuery {
-  page?: number;
-  limit?: number;
-}
-
 export class CreditsResource {
   constructor(private readonly client: MeterFlow) {}
 
@@ -40,9 +35,7 @@ export class CreditsResource {
     return this.client.request<CreditBalanceResponse>("GET", `credits/${encodeURIComponent(customerId)}/balance`);
   }
 
-  transactions(customerId: string, query?: TransactionsQuery): Promise<CreditTransactionResponse[]> {
-    return this.client.request<CreditTransactionResponse[]>("GET", `credits/${encodeURIComponent(customerId)}/transactions`, {
-      ...(query !== undefined && { query: query as Record<string, string | number | boolean> }),
-    });
+  transactions(customerId: string): Promise<CreditTransactionResponse[]> {
+    return this.client.request<CreditTransactionResponse[]>("GET", `credits/${encodeURIComponent(customerId)}/transactions`);
   }
 }

@@ -177,10 +177,10 @@ bal.total_granted;  // "5250.000000"
 bal.total_consumed; // "1705.000000"
 ```
 
-**Transactions** — the full history, newest first, paginated:
+**Transactions** — the customer's full history, newest first, in one response:
 
 ```typescript
-const txns = await client.credits.transactions("customer_123", { page: 1, limit: 50 });
+const txns = await client.credits.transactions("customer_123");
 for (const t of txns) {
   console.log(t.transaction_type, t.amount, t.balance_after, t.description, t.created_at);
 }
@@ -223,6 +223,39 @@ for (let i = 0; i < events.length; i += MAX_BATCH_EVENTS) {
   await client.usage.recordBatch(chunk, { idempotencyKey: `job-42:chunk-${i / MAX_BATCH_EVENTS}` });
 }
 ```
+
+### Record quantities, not calls
+
+**A batch of 100 events is still 100 events.** Batching saves HTTP requests, not quota: each item in a `recordBatch` is its own record, and your plan's monthly allowance counts records. The thing that actually moves the number is sending **one event that carries the quantity**.
+
+If your meter's aggregation is `sum`, MeterFlow adds up the `value` of its events — so one event with `value: 100` is **one** event against your monthly allowance and **100 units** against the meter. Record per unit of work instead of per API call:
+
+```typescript
+// ❌ One event per call — 100 calls is 100 events against your plan.
+for (const chunk of completion.chunks) {
+  await client.usage.record({
+    event_name: "tokens.used",
+    customer_external_id: "customer_123",
+    value: 1,
+    properties: {},
+  });
+}
+
+// ✅ One event carrying the quantity — 1 event against your plan, 1,300 units on the meter.
+await client.usage.record({
+  event_name: "tokens.used",
+  customer_external_id: "customer_123",
+  value: 1300,                 // a `sum` meter adds these up
+  properties: { model: "gpt-4o-mini" },
+});
+```
+
+This is usually the difference between fitting a plan and outgrowing it: 1,000 users × 100 calls a day is ~3M events a month recorded per call, and ~30k recorded per session. Aggregate in your app over whatever window you can afford to lose on a crash — a request, a job, a minute — then send one event.
+
+Two things to keep in mind:
+
+- **It only helps a `sum` meter.** A `count` meter ignores `value` and counts occurrences, so there each occurrence has to be its own event. `max`, `min` and `unique_count` read `value` as a measurement, not a quantity to add.
+- **Billing is unchanged.** A metered plan limit charges per unit — the event's `value` — so 100 units cost the same whether they arrived as 100 events or one. You are not rounding anyone's bill by batching.
 
 **Summary** — a customer's usage, broken down by meter:
 
@@ -345,6 +378,17 @@ await client.credits.deduct(
 
 Every write method accepts the option: `credits.grant/deduct`, `usage.record/recordBatch`, `subscriptions.create/update`. Use a key that identifies the *business operation* (order ID, job ID) — not a random value per attempt, which would defeat the purpose.
 
+**A key is bound to the body you first used it with.** MeterFlow stores a fingerprint of the request alongside the key, so a retry only replays when it is genuinely the same request. Reuse the key with a *different* body and the call is refused with `ConflictError` (409) instead of quietly handing back the original record:
+
+```typescript
+await client.credits.grant({ customer_external_id: "customer_123", amount: 100, metadata: {} }, { idempotencyKey: "welcome-123" });
+
+// Same key, different amount → ConflictError. Nothing is written, and the first grant stands.
+await client.credits.grant({ customer_external_id: "customer_123", amount: 250, metadata: {} }, { idempotencyKey: "welcome-123" });
+```
+
+That is deliberate: silently returning the first record would turn two different operations into one and report success. One key per operation, reused only to retry that same operation. Keys stay namespaced per environment, so a `mf_test_` and a `mf_live_` key never collide.
+
 ## Automatic retries
 
 The SDK retries transient failures for you — exponential backoff with jitter, 3 attempts by default:
@@ -377,7 +421,7 @@ Every error carries:
 
 - **`requestId`** — the API's `X-Request-ID` for that call. Include it when contacting support; it pinpoints the exact request in our logs.
 - **`statusCode`**, **`errorType`**, and **`retryable`** — for programmatic handling and structured logging.
-- **`message`** — the API's own sentence (e.g. `Plan limit reached: the Drip plan includes 5,000 usage events per month…`). A `ValidationError` appends its field detail (`Validation failed: amount: must be greater than 0`) and also exposes it structured as **`.fields`** (`{ field, message }[]`).
+- **`message`** — the API's own sentence (e.g. `Plan limit reached: the Drip plan includes 50,000 usage events per month…`). A `ValidationError` appends its field detail (`Validation failed: amount: must be greater than 0`) and also exposes it structured as **`.fields`** (`{ field, message }[]`).
 
 ```typescript
 import { MeterFlowError, InsufficientCreditsError, RateLimitError } from "meterflow";
@@ -440,6 +484,10 @@ Every delivery is a flat JSON object (`Content-Type: application/json`) with two
 | `subscription.created` | a subscription is created | `customer_id`, `plan_id`, `subscription_id`, `status` |
 | `subscription.updated` | a subscription is updated | `customer_id`, `subscription_id`, `status` |
 | `limit.reached` | a customer first reaches a **hard** or **soft** limit's included units this billing period (once per meter per period; metered limits report through `credit.deducted` instead) | `customer_id`, `subscription_id`, `feature` (the meter's `event_name`), `meter_id`, `limit_type`, `included`, `used`, `period_start`, `period_end` |
+| `balance.low` | a deduction takes a customer's balance **down through** this endpoint's `low_balance_threshold` — a crossing, so it fires once and not again while they stay below. Needs the threshold set on the webhook; without one it never fires | `customer_id`, `balance`, `threshold`, `transaction_id` |
+| `balance.exhausted` | a balance reaches zero, **or** a request is refused for want of credits (a deduction returning 402, or `entitlements.check` answering `insufficient_credits`). Unlike `balance.low` this repeats: every refused request is its own blocked request | `customer_id`, `balance`, `reason` (`balance_zero` / `insufficient_credits`), `requested_amount` and `feature` where they apply, `transaction_id` on the zero case |
+| `subscription.renewed` | a billing period rolls forward (the renewer; no `subscription.updated` is emitted for a renewal) | `customer_id`, `subscription_id`, `plan_id`, `current_period_start`, `current_period_end`, `credits_granted` |
+| `subscription.canceled` | a subscription's status becomes canceled — fired **alongside** `subscription.updated`, once, on the call that actually cancels | `customer_id`, `subscription_id`, `plan_id`, `canceled_at` |
 
 For example, a `credit.granted` delivery:
 
@@ -509,6 +557,6 @@ await client.usage.record({
 
 // Support asks: "what's Ana's situation?"
 const balance = await client.credits.balance("ana");
-const history = await client.credits.transactions("ana", { limit: 20 });
+const history = await client.credits.transactions("ana");
 const usage = await client.usage.summary("ana");
 ```

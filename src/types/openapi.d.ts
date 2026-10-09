@@ -698,6 +698,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/analytics/usage/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Usage summary — per-meter totals across every customer of one data environment: value, event count, first and last event */
+        get: operations["usageSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analytics/subscriptions/by-plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Plan adoption — per-status subscription counts per plan, plus subscriptions created per plan over time, one environment */
+        get: operations["subscriptionsByPlan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/stats": {
         parameters: {
             query?: never;
@@ -868,6 +902,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/billing/event-packs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The prepaid event-pack SKU (size, price, availability) */
+        get: operations["eventPackCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/organizations/{org_id}/event-packs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Event packs covering this organization right now */
+        get: operations["orgEventPacks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/event-packs/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start a checkout for one or more prepaid event packs */
+        post: operations["eventPackCheckout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/billing/webhooks/paddle": {
         parameters: {
             query?: never;
@@ -913,6 +998,149 @@ export interface paths {
         get: operations["checkEntitlement"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List a project's customers — every customer_external_id with a subscription, balance or usage in one data environment */
+        get: operations["list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search one project — customers, API keys, meters and plans, grouped */
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List a project's provider connectors */
+        get: operations["list"];
+        put?: never;
+        /** Connect a payment provider account to a project */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connectors/{connector_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a connector by ID */
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        /** Delete a connector */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        /** Update a connector */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v1/connectors/{connector_id}/price-mappings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List a connector's price-to-plan mappings */
+        get: operations["listPriceMappings"];
+        put?: never;
+        /** Map a provider price to a plan */
+        post: operations["addPriceMapping"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connectors/{connector_id}/price-mappings/{mapping_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a price-to-plan mapping */
+        delete: operations["removePriceMapping"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connectors/{connector_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A connector's delivery log, newest first */
+        get: operations["listEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connectors/{connector_id}/webhooks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Inbound webhooks from a tenant's own payment provider (signature-verified)
+         * @description No auth dependency on purpose — the HMAC over the raw body IS the authentication, and the connector id in the URL grants nothing on its own. Which headers carry that signature depends on the connector's provider (`Paddle-Signature` for Paddle; `webhook-id` / `webhook-timestamp` / `webhook-signature`, the Standard Webhooks scheme, for Polar), so they are read from the request rather than declared here. An unknown connector id, a malformed one and a bad signature all answer the same 401.
+         */
+        post: operations["receiveWebhook"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1051,6 +1279,8 @@ export interface components {
             created_at: string;
             /** Revoked At */
             revoked_at: string | null;
+            /** Last Used At */
+            last_used_at: string | null;
             /** Raw Key */
             raw_key: string;
         };
@@ -1081,6 +1311,8 @@ export interface components {
             created_at: string;
             /** Revoked At */
             revoked_at: string | null;
+            /** Last Used At */
+            last_used_at: string | null;
         };
         /**
          * BillingConfigResponse
@@ -1174,6 +1406,153 @@ export interface components {
             client_token: string;
             /** Environment */
             environment: string;
+        };
+        /** ConnectorCreateRequest */
+        ConnectorCreateRequest: {
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Provider */
+            provider: string;
+            /**
+             * Environment
+             * @default live
+             */
+            environment: string;
+            /** Webhook Secret */
+            webhook_secret: string;
+            /**
+             * Is Enabled
+             * @default true
+             */
+            is_enabled: boolean;
+            /**
+             * Metadata
+             * @default {}
+             */
+            metadata: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * ConnectorEventResponse
+         * @description One row of a connector's delivery log.
+         *
+         *     Deliberately carries **no `payload`**. The raw provider body routinely holds the tenant's own
+         *     end-customer PII (Paddle puts name, email and billing address on a subscription event), a
+         *     dashboard list has no use for it, and we are not the system of record for their provider's
+         *     events — their Paddle dashboard is. `detail` is written for a human to read and is what answers
+         *     "why did nothing happen?". See docs/DECISIONS.md, 2026-10-09.
+         */
+        ConnectorEventResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Connector Id
+             * Format: uuid
+             */
+            connector_id: string;
+            /** Event Id */
+            event_id: string;
+            /** Event Type */
+            event_type: string;
+            /** Status */
+            status: string;
+            /** Detail */
+            detail: string | null;
+            /** Subscription Id */
+            subscription_id: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /**
+             * Received At
+             * Format: date-time
+             */
+            received_at: string;
+        };
+        /**
+         * ConnectorResponse
+         * @description Returned on every read and write. There is deliberately no variant that carries
+         *     `webhook_secret` — not even on create, unlike WebhookCreateResponse. We do not generate
+         *     this secret, so there is nothing the caller does not already have, and the only thing a
+         *     one-time reveal would add is a second place for it to leak. `secret_hint` is the last 4
+         *     characters, enough to tell two secrets apart.
+         */
+        ConnectorResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Provider */
+            provider: string;
+            /** Environment */
+            environment: string;
+            /** Secret Hint */
+            secret_hint: string;
+            /** Is Enabled */
+            is_enabled: boolean;
+            /** Metadata */
+            metadata_: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * ConnectorUpdateRequest
+         * @description Provider and environment are immutable — they identify which account this is, and
+         *     changing either would silently re-point a connector at a different Paddle account while
+         *     keeping its price mappings. Delete and recreate instead.
+         */
+        ConnectorUpdateRequest: {
+            /** Webhook Secret */
+            webhook_secret?: string | null;
+            /** Is Enabled */
+            is_enabled?: boolean | null;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /**
+         * ConnectorWebhookAckResponse
+         * @description What the tenant's provider sees. Deliberately says nothing about their account: the provider
+         *     only needs to know the delivery landed, and a richer body would be readable by anyone who
+         *     replays a captured event.
+         */
+        ConnectorWebhookAckResponse: {
+            /**
+             * Received
+             * @default true
+             */
+            received: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "processed" | "ignored" | "duplicate";
         };
         /** CreditBalanceResponse */
         CreditBalanceResponse: {
@@ -1284,6 +1663,49 @@ export interface components {
              */
             created_at: string;
         };
+        /** CustomerListResponse */
+        CustomerListResponse: {
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Environment */
+            environment: string;
+            /** Customers */
+            customers: components["schemas"]["CustomerResponse"][];
+        };
+        /**
+         * CustomerResponse
+         * @description One of the project's end customers — a `customer_external_id` the SDK has written data for.
+         *
+         *     A customer is whoever has at least one of a subscription, a credit balance or a usage event in
+         *     the requested environment; there is no customers table, so every field is derived from those.
+         */
+        CustomerResponse: {
+            /** Customer External Id */
+            customer_external_id: string;
+            /** Subscription Status */
+            subscription_status: string | null;
+            /** Plan Id */
+            plan_id: string | null;
+            /** Plan Name */
+            plan_name: string | null;
+            /** Balance */
+            balance: string | null;
+            /** Event Count */
+            event_count: number;
+            /**
+             * First Seen At
+             * Format: date-time
+             */
+            first_seen_at: string;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+        };
         /**
          * DashboardSessionKeyRequest
          * @description Body of the dashboard-session mint — which data world the dashboard wants to look at.
@@ -1349,6 +1771,67 @@ export interface components {
             period_end: string | null;
             /** Entitlements */
             entitlements: components["schemas"]["EntitlementResponse"][];
+        };
+        /**
+         * EventPackCatalogResponse
+         * @description What one prepaid event pack is and costs — one SKU for every tier (decision 2026-10-06).
+         */
+        EventPackCatalogResponse: {
+            /** Events */
+            events: number;
+            /** Price Usd */
+            price_usd: number;
+            /** Max Quantity */
+            max_quantity: number;
+            /** Late Purchase Days */
+            late_purchase_days: number;
+            /** Price Id */
+            price_id?: string | null;
+            /** Configured */
+            configured: boolean;
+        };
+        /** EventPackCheckoutRequest */
+        EventPackCheckoutRequest: {
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Quantity
+             * @default 1
+             */
+            quantity: number;
+        };
+        /**
+         * EventPackResponse
+         * @description One purchased pack and the window it covers. It expires at `applies_until` — no remainder.
+         */
+        EventPackResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Events */
+            events: number;
+            /** Quantity */
+            quantity: number;
+            /**
+             * Applies From
+             * Format: date-time
+             */
+            applies_from: string;
+            /**
+             * Applies Until
+             * Format: date-time
+             */
+            applies_until: string;
+            /**
+             * Purchased At
+             * Format: date-time
+             */
+            purchased_at: string;
         };
         /**
          * FeatureType
@@ -1528,6 +2011,21 @@ export interface components {
             billing_email?: string | null;
         };
         /**
+         * OrganizationEventPacksResponse
+         * @description The org's packs that are live right now, newest purchase first, plus their total.
+         */
+        OrganizationEventPacksResponse: {
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /** Active Events */
+            active_events: number;
+            /** Packs */
+            packs: components["schemas"]["EventPackResponse"][];
+        };
+        /**
          * OrganizationLimitsResponse
          * @description An organization's current caps plus how much of each it uses today.
          */
@@ -1595,6 +2093,8 @@ export interface components {
         OrganizationUsageResponse: {
             /** Events This Month */
             events_this_month: number;
+            /** Event Pack Events */
+            event_pack_events: number;
             /** Projects Active */
             projects_active: number;
             /** Team Seats */
@@ -1652,6 +2152,11 @@ export interface components {
              * @default true
              */
             is_public: boolean;
+            /**
+             * Is Published
+             * @default true
+             */
+            is_published: boolean;
             /**
              * Metadata
              * @default {}
@@ -1738,6 +2243,8 @@ export interface components {
             is_active: boolean;
             /** Is Public */
             is_public: boolean;
+            /** Is Published */
+            is_published: boolean;
             /** Metadata */
             metadata_: {
                 [key: string]: unknown;
@@ -1757,6 +2264,103 @@ export interface components {
              */
             updated_at: string;
         };
+        /**
+         * PlanSubscriptionCounts
+         * @description How many subscriptions a plan holds in each state, in one data environment.
+         *
+         *     Per status rather than a single "subscribers" number on purpose: what counts as a subscriber
+         *     is a product question the UI answers (the Plans column shows active + trialing), and a server
+         *     that decided it would force every future consumer — the catalog page, a churn view, an export —
+         *     to either accept that definition or go back to the database.
+         */
+        PlanSubscriptionCounts: {
+            /**
+             * Active
+             * @default 0
+             */
+            active: number;
+            /**
+             * Trialing
+             * @default 0
+             */
+            trialing: number;
+            /**
+             * Past Due
+             * @default 0
+             */
+            past_due: number;
+            /**
+             * Paused
+             * @default 0
+             */
+            paused: number;
+            /**
+             * Canceled
+             * @default 0
+             */
+            canceled: number;
+            /**
+             * Expired
+             * @default 0
+             */
+            expired: number;
+        };
+        /** PlanSubscriptionsItem */
+        PlanSubscriptionsItem: {
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /** Plan Name */
+            plan_name: string;
+            counts: components["schemas"]["PlanSubscriptionCounts"];
+        };
+        /**
+         * PlanSubscriptionsPoint
+         * @description Subscriptions *created* in one bucket for one plan — the adoption series, not a running total.
+         */
+        PlanSubscriptionsPoint: {
+            /**
+             * Bucket
+             * Format: date-time
+             */
+            bucket: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /** Created */
+            created: number;
+        };
+        /**
+         * PlanSubscriptionsResponse
+         * @description Plan adoption: where a project's subscriptions sit today, and how they arrived.
+         *
+         *     Every plan of the project appears in `plans`, including those with no subscriptions at all —
+         *     a zero is the answer to "is anyone on this plan?", and omitting the row would leave the
+         *     dashboard unable to tell "none" from "not loaded".
+         */
+        PlanSubscriptionsResponse: {
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Granularity */
+            granularity: string;
+            /** Environment */
+            environment: string;
+            /** From */
+            from_: string | null;
+            /** To */
+            to: string | null;
+            /** Plans */
+            plans: components["schemas"]["PlanSubscriptionsItem"][];
+            /** Series */
+            series: components["schemas"]["PlanSubscriptionsPoint"][];
+        };
         /** PlanUpdateRequest */
         PlanUpdateRequest: {
             /** Name */
@@ -1769,6 +2373,8 @@ export interface components {
             is_active?: boolean | null;
             /** Is Public */
             is_public?: boolean | null;
+            /** Is Published */
+            is_published?: boolean | null;
             /** Metadata */
             metadata?: {
                 [key: string]: unknown;
@@ -1846,6 +2452,46 @@ export interface components {
             /** Url */
             url: string;
         };
+        /** PriceMappingCreateRequest */
+        PriceMappingCreateRequest: {
+            /** Provider Price Id */
+            provider_price_id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+        };
+        /** PriceMappingResponse */
+        PriceMappingResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Connector Id
+             * Format: uuid
+             */
+            connector_id: string;
+            /** Provider Price Id */
+            provider_price_id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** ProjectCreateRequest */
         ProjectCreateRequest: {
             /** Name */
@@ -1906,6 +2552,26 @@ export interface components {
             /** Plans */
             plans: number;
         };
+        /**
+         * ProjectUsageSummaryResponse
+         * @description What every meter counted across ALL customers of one data world — the Usage page before a
+         *     customer is looked up. Same per-meter shape as the SDK's per-customer summary.
+         */
+        ProjectUsageSummaryResponse: {
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Environment */
+            environment: string;
+            /** From */
+            from_: string | null;
+            /** To */
+            to: string | null;
+            /** Meters */
+            meters: components["schemas"]["UsageSummaryItem"][];
+        };
         /** RegistrationRequest */
         RegistrationRequest: {
             /**
@@ -1956,6 +2622,60 @@ export interface components {
             credits_deducted: string;
             /** Transaction Count */
             transaction_count: number;
+        };
+        /**
+         * SearchHit
+         * @description One result, in the shape the palette renders: a thing to open, named, with its context.
+         *
+         *     `id` is whatever the consumer needs to act on the hit — a UUID for a configured resource, the
+         *     customer's own external id for a customer — as a string, because the palette only ever puts it
+         *     back in a route or a query param.
+         */
+        SearchHit: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Secondary */
+            secondary?: string | null;
+        };
+        /**
+         * SearchResponse
+         * @description Hits grouped by what they are, so the caller does not have to classify them back.
+         *
+         *     One response with groups rather than four endpoints: the palette asks one question per
+         *     keystroke, and four round trips would race each other into a half-filled list.
+         */
+        SearchResponse: {
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Environment */
+            environment: string;
+            /** Query */
+            query: string;
+            /**
+             * Customers
+             * @default []
+             */
+            customers: components["schemas"]["SearchHit"][];
+            /**
+             * Api Keys
+             * @default []
+             */
+            api_keys: components["schemas"]["SearchHit"][];
+            /**
+             * Meters
+             * @default []
+             */
+            meters: components["schemas"]["SearchHit"][];
+            /**
+             * Plans
+             * @default []
+             */
+            plans: components["schemas"]["SearchHit"][];
         };
         /** SubscriptionCreateRequest */
         SubscriptionCreateRequest: {
@@ -2206,6 +2926,10 @@ export interface components {
             value: string;
             /** Event Count */
             event_count: number;
+            /** First Event At */
+            first_event_at?: string | null;
+            /** Last Event At */
+            last_event_at?: string | null;
         };
         /** UsageSummaryResponse */
         UsageSummaryResponse: {
@@ -2320,6 +3044,8 @@ export interface components {
             events: string[];
             /** Secret */
             secret?: string | null;
+            /** Low Balance Threshold */
+            low_balance_threshold?: number | string | null;
             /**
              * Metadata
              * @default {}
@@ -2347,6 +3073,8 @@ export interface components {
             url: string;
             /** Events */
             events: string[];
+            /** Low Balance Threshold */
+            low_balance_threshold: string | null;
             /** Is Active */
             is_active: boolean;
             /** Last Triggered At */
@@ -2425,6 +3153,8 @@ export interface components {
             url: string;
             /** Events */
             events: string[];
+            /** Low Balance Threshold */
+            low_balance_threshold: string | null;
             /** Is Active */
             is_active: boolean;
             /** Last Triggered At */
@@ -2454,6 +3184,8 @@ export interface components {
             events?: string[] | null;
             /** Is Active */
             is_active?: boolean | null;
+            /** Low Balance Threshold */
+            low_balance_threshold?: number | string | null;
             /** Metadata */
             metadata?: {
                 [key: string]: unknown;
@@ -4326,6 +5058,75 @@ export interface operations {
             };
         };
     };
+    usageSummary: {
+        parameters: {
+            query: {
+                project_id: string;
+                from_?: string | null;
+                to?: string | null;
+                environment?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectUsageSummaryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    subscriptionsByPlan: {
+        parameters: {
+            query: {
+                project_id: string;
+                from_?: string | null;
+                to?: string | null;
+                granularity?: string;
+                environment?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanSubscriptionsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     admin_stats: {
         parameters: {
             query?: never;
@@ -4576,6 +5377,90 @@ export interface operations {
             };
         };
     };
+    eventPackCatalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventPackCatalogResponse"];
+                };
+            };
+        };
+    };
+    orgEventPacks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationEventPacksResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    eventPackCheckout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EventPackCheckoutRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     paddleWebhook: {
         parameters: {
             query?: never;
@@ -4662,6 +5547,396 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EntitlementResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query: {
+                project_id: string;
+                environment?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search: {
+        parameters: {
+            query: {
+                project_id: string;
+                q: string;
+                environment?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query: {
+                project_id: string;
+                environment?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectorCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectorUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listPriceMappings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceMappingResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    addPriceMapping: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceMappingCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceMappingResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    removePriceMapping: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+                mapping_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceMappingResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listEvents: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorEventResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    receiveWebhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorWebhookAckResponse"];
                 };
             };
             /** @description Validation Error */
