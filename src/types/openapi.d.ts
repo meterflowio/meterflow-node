@@ -198,6 +198,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload the current user's avatar image */
+        post: operations["uploadAvatar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{user_id}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a user's uploaded avatar image
+         * @description Served without auth: an `<img>` tag sends no Authorization header, and the id is a UUID.
+         *
+         *     Cached privately and briefly — long enough that a page of rows does not re-fetch it, short
+         *     enough that a new upload shows up without a hard reload.
+         */
+        get: operations["avatar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations": {
         parameters: {
             query?: never;
@@ -617,7 +657,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List webhooks for a project */
+        /**
+         * List webhooks for a project (JWT or API key; never includes a secret)
+         * @description Readable with an API key so an SDK consumer can see which endpoints are registered without
+         *     opening the dashboard. Registering, editing and deleting one stays JWT-only.
+         */
         get: operations["list"];
         put?: never;
         /** Register a webhook for a project */
@@ -654,7 +698,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List delivery attempts for a webhook */
+        /**
+         * List delivery attempts for a webhook, newest first (JWT or API key; at most 100, and an API key sees only its own environment)
+         * @description The receipts: what was sent, the HTTP answer, how many attempts and when the next one is due.
+         *
+         *     A webhook in another project answers 404, never 403 — an opaque id must not confirm that it
+         *     exists somewhere else.
+         */
         get: operations["listDeliveryAttempts"];
         put?: never;
         post?: never;
@@ -1138,9 +1188,85 @@ export interface paths {
         put?: never;
         /**
          * Inbound webhooks from a tenant's own payment provider (signature-verified)
-         * @description No auth dependency on purpose — the HMAC over the raw body IS the authentication, and the connector id in the URL grants nothing on its own. Which headers carry that signature depends on the connector's provider (`Paddle-Signature` for Paddle; `webhook-id` / `webhook-timestamp` / `webhook-signature`, the Standard Webhooks scheme, for Polar), so they are read from the request rather than declared here. An unknown connector id, a malformed one and a bad signature all answer the same 401.
+         * @description No auth dependency on purpose — the HMAC over the raw body IS the authentication, and the connector id in the URL grants nothing on its own. Which headers carry that signature depends on the connector's provider (`Paddle-Signature` for Paddle; `webhook-id` / `webhook-timestamp` / `webhook-signature`, the Standard Webhooks scheme, for Polar; `X-Signature`, a bare hex HMAC-SHA256 with no timestamp, for Lemon Squeezy; `Authorization: Basic …` for Chargebee, which signs nothing and offers only HTTP Basic auth; and `X-Razorpay-Signature`, a hex HMAC-SHA256 over the raw body, for Razorpay), so they are read from the request rather than declared here. An unknown connector id, a malformed one and a bad credential all answer the same 401.
          */
         post: operations["receiveWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mint a portal link for one of your customers — API key, called by your server */
+        post: operations["createSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What this portal link is for — read with the link's own token
+         * @description Everything the page may know. The project is not among it: an end user has no use for it,
+         *     and a page cannot leak what it was never told.
+         */
+        get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The balance of the customer this link is for */
+        get: operations["balance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One page of that customer's ledger, newest first
+         * @description No customer id is read from the request anywhere in this router — the token names the one
+         *     customer it is for, so a link cannot be pointed at a second one.
+         */
+        get: operations["transactions"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1365,6 +1491,14 @@ export interface components {
             current_period_end?: string | null;
             /** Cancel Effective At */
             cancel_effective_at?: string | null;
+        };
+        /** Body_uploadAvatar */
+        Body_uploadAvatar: {
+            /**
+             * File
+             * @description PNG, JPEG or WebP, 256 KB or smaller
+             */
+            file: string;
         };
         /**
          * ChangePlanRequest
@@ -1625,6 +1759,20 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * CreditTransactionPage
+         * @description One page of a customer's credit ledger, newest first.
+         *
+         *     `next_cursor` is the opaque mark for the page after this one, and `null` on the last page —
+         *     pass it back as `cursor` unchanged. The list grows with a customer's traffic, which is why it
+         *     is paged at all (docs/DECISIONS.md, 2026-10-14).
+         */
+        CreditTransactionPage: {
+            /** Data */
+            data: components["schemas"]["CreditTransactionResponse"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
         /** CreditTransactionResponse */
         CreditTransactionResponse: {
             /**
@@ -1663,7 +1811,13 @@ export interface components {
              */
             created_at: string;
         };
-        /** CustomerListResponse */
+        /**
+         * CustomerListResponse
+         * @description One page of a project's customers, most recently active first.
+         *
+         *     `data` rather than `customers`, and `next_cursor` beside it, so every paged list in the API
+         *     reads the same way — the list grows with a project's traffic (docs/DECISIONS.md, 2026-10-14).
+         */
         CustomerListResponse: {
             /**
              * Project Id
@@ -1672,8 +1826,10 @@ export interface components {
             project_id: string;
             /** Environment */
             environment: string;
-            /** Customers */
-            customers: components["schemas"]["CustomerResponse"][];
+            /** Data */
+            data: components["schemas"]["CustomerResponse"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
         };
         /**
          * CustomerResponse
@@ -1735,7 +1891,7 @@ export interface components {
          * @description Why `allowed` is what it is. Absent (None) when the feature is simply included and within limits.
          * @enum {string}
          */
-        EntitlementReason: "no_subscription" | "not_in_plan" | "hard_limit_reached" | "soft_limit_exceeded" | "insufficient_credits";
+        EntitlementReason: "no_subscription" | "not_in_plan" | "hard_limit_reached" | "soft_limit_exceeded" | "insufficient_credits" | "spend_cap_reached";
         /** EntitlementResponse */
         EntitlementResponse: {
             /** Feature */
@@ -1898,6 +2054,7 @@ export interface components {
             aggregation_field?: string | null;
             /**
              * Filter Conditions
+             * @description Not implemented: must be empty. A meter counts every event carrying its `event_name`.
              * @default {}
              */
             filter_conditions: {
@@ -2148,11 +2305,6 @@ export interface components {
              */
             trial_days: number;
             /**
-             * Is Public
-             * @default true
-             */
-            is_public: boolean;
-            /**
              * Is Published
              * @default true
              */
@@ -2241,8 +2393,6 @@ export interface components {
             trial_days: number;
             /** Is Active */
             is_active: boolean;
-            /** Is Public */
-            is_public: boolean;
             /** Is Published */
             is_published: boolean;
             /** Metadata */
@@ -2371,8 +2521,6 @@ export interface components {
             trial_days?: number | null;
             /** Is Active */
             is_active?: boolean | null;
-            /** Is Public */
-            is_public?: boolean | null;
             /** Is Published */
             is_published?: boolean | null;
             /** Metadata */
@@ -2438,6 +2586,64 @@ export interface components {
             total_credits_granted: string;
             /** Total Credits Deducted */
             total_credits_deducted: string;
+        };
+        /**
+         * PortalContextResponse
+         * @description What the page itself needs before it renders: who this is for, how long it has, and the two
+         *     links the tenant chose. No key, no project id, nothing about any other customer.
+         */
+        PortalContextResponse: {
+            /** Customer External Id */
+            customer_external_id: string;
+            /** Environment */
+            environment: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Return Url */
+            return_url?: string | null;
+            /** Topup Url */
+            topup_url?: string | null;
+        };
+        /**
+         * PortalLinkRequest
+         * @description One link, for one of the caller's customers. The environment is **not** here: it comes from
+         *     the API key's prefix, like every other SDK-facing write.
+         */
+        PortalLinkRequest: {
+            /** Customer External Id */
+            customer_external_id: string;
+            /** Return Url */
+            return_url?: string | null;
+            /** Topup Url */
+            topup_url?: string | null;
+            /** Expires In Minutes */
+            expires_in_minutes?: number | null;
+        };
+        /**
+         * PortalLinkResponse
+         * @description The link to send, and what it is for. The signing material is never part of this.
+         */
+        PortalLinkResponse: {
+            /** Url */
+            url: string;
+            /** Token */
+            token: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Customer External Id */
+            customer_external_id: string;
+            /** Environment */
+            environment: string;
+            /** Return Url */
+            return_url?: string | null;
+            /** Topup Url */
+            topup_url?: string | null;
         };
         /** PortalSessionRequest */
         PortalSessionRequest: {
@@ -2686,6 +2892,12 @@ export interface components {
             plan_id: string;
             /** Customer External Id */
             customer_external_id: string;
+            /** Spend Cap */
+            spend_cap?: number | string | null;
+            /** Topup Amount */
+            topup_amount?: number | string | null;
+            /** Max Topups Per Window */
+            max_topups_per_window?: number | null;
             /**
              * Metadata
              * @default {}
@@ -2695,6 +2907,20 @@ export interface components {
             };
             /** Idempotency Key */
             idempotency_key?: string | null;
+        };
+        /**
+         * SubscriptionPage
+         * @description One page of a project's subscriptions, newest first.
+         *
+         *     `next_cursor` is the opaque mark for the page after this one, and `null` on the last page —
+         *     pass it back as `cursor` unchanged. The list grows with a customer's traffic, which is why it
+         *     is paged at all (docs/DECISIONS.md, 2026-10-14).
+         */
+        SubscriptionPage: {
+            /** Data */
+            data: components["schemas"]["SubscriptionResponse"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
         };
         /** SubscriptionResponse */
         SubscriptionResponse: {
@@ -2728,6 +2954,14 @@ export interface components {
             current_period_end: string | null;
             /** Trial End Date */
             trial_end_date: string | null;
+            /** Spend Cap */
+            spend_cap: string | null;
+            /** Topup Amount */
+            topup_amount: string | null;
+            /** Max Topups Per Window */
+            max_topups_per_window: number | null;
+            /** Idempotency Key */
+            idempotency_key: string | null;
             /** Canceled At */
             canceled_at: string | null;
             /** Metadata */
@@ -2762,6 +2996,12 @@ export interface components {
         /** SubscriptionUpdateRequest */
         SubscriptionUpdateRequest: {
             status?: components["schemas"]["SubscriptionStatus"] | null;
+            /** Spend Cap */
+            spend_cap?: number | string | null;
+            /** Topup Amount */
+            topup_amount?: number | string | null;
+            /** Max Topups Per Window */
+            max_topups_per_window?: number | null;
             /** Metadata */
             metadata?: {
                 [key: string]: unknown;
@@ -2832,9 +3072,9 @@ export interface components {
             customer_external_id: string;
             /**
              * Value
-             * @default 1
+             * @description How much this event is worth to the meter. Resolved in this order: an explicit value wins; otherwise, for a sum / max / min meter that names an `aggregation_field`, the numeric value of that property; otherwise 1. A property that is absent, null or not a number falls through to 1, and a negative one is refused.
              */
-            value: number | string;
+            value?: number | string | null;
             /**
              * Properties
              * @default {}
@@ -2988,6 +3228,8 @@ export interface components {
              * @default false
              */
             is_superuser: boolean;
+            /** Avatar Url */
+            avatar_url?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -3040,7 +3282,10 @@ export interface components {
             project_id: string;
             /** Url */
             url: string;
-            /** Events */
+            /**
+             * Events
+             * @description `balance.low` and `balance.topped_up` are derived from `low_balance_threshold`: with a threshold they are added whether or not they are listed, and without one they are removed.
+             */
             events: string[];
             /** Secret */
             secret?: string | null;
@@ -3180,7 +3425,10 @@ export interface components {
         WebhookUpdateRequest: {
             /** Url */
             url?: string | null;
-            /** Events */
+            /**
+             * Events
+             * @description `balance.low` and `balance.topped_up` are derived from `low_balance_threshold`: with a threshold they are added whether or not they are listed, and without one they are removed.
+             */
             events?: string[] | null;
             /** Is Active */
             is_active?: boolean | null;
@@ -3544,6 +3792,78 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserLimitsResponse"];
+                };
+            };
+        };
+    };
+    uploadAvatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_uploadAvatar"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    avatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The image bytes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "image/*": unknown;
+                };
+            };
+            /** @description No avatar */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -4362,6 +4682,10 @@ export interface operations {
         parameters: {
             query?: {
                 customer_id?: string | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
             };
             header?: never;
             path?: never;
@@ -4375,7 +4699,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SubscriptionResponse"][];
+                    "application/json": components["schemas"]["SubscriptionPage"];
                 };
             };
             /** @description Validation Error */
@@ -4627,7 +4951,12 @@ export interface operations {
     };
     transactions: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+            };
             header?: never;
             path: {
                 customer_id: string;
@@ -4642,7 +4971,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CreditTransactionResponse"][];
+                    "application/json": components["schemas"]["CreditTransactionPage"];
                 };
             };
             /** @description Validation Error */
@@ -4796,8 +5125,8 @@ export interface operations {
     };
     list: {
         parameters: {
-            query: {
-                project_id: string;
+            query?: {
+                project_id?: string | null;
             };
             header?: never;
             path?: never;
@@ -5565,6 +5894,10 @@ export interface operations {
             query: {
                 project_id: string;
                 environment?: string;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
             };
             header?: never;
             path?: never;
@@ -5937,6 +6270,113 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConnectorWebhookAckResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    createSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PortalLinkRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalLinkResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalContextResponse"];
+                };
+            };
+        };
+    };
+    balance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditBalanceResponse"];
+                };
+            };
+        };
+    };
+    transactions: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditTransactionPage"];
                 };
             };
             /** @description Validation Error */

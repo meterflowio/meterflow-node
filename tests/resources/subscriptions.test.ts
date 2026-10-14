@@ -66,23 +66,36 @@ describe("subscriptions.create", () => {
 });
 
 describe("subscriptions.list", () => {
-  it("GET /subscriptions returns list", async () => {
-    server.use(http.get(`${BASE}/subscriptions`, () => HttpResponse.json([SUB_RESPONSE])));
+  const PAGE = { data: [SUB_RESPONSE], next_cursor: "Y3Vyc29y" };
+
+  it("GET /subscriptions returns a page, not a bare array", async () => {
+    server.use(http.get(`${BASE}/subscriptions`, () => HttpResponse.json(PAGE)));
     const result = await makeClient().subscriptions.list();
-    expect(result).toHaveLength(1);
-    expect(result[0]?.id).toBe("sub-1");
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0]?.id).toBe("sub-1");
+    expect(result.next_cursor).toBe("Y3Vyc29y");
   });
 
-  it("passes customer_id query param", async () => {
+  it("the last page says there is nothing after it", async () => {
+    server.use(http.get(`${BASE}/subscriptions`, () => HttpResponse.json({ data: [], next_cursor: null })));
+    const result = await makeClient().subscriptions.list();
+    expect(result.data).toEqual([]);
+    expect(result.next_cursor).toBeNull();
+  });
+
+  it("passes customer_id, limit and cursor as query params", async () => {
     let capturedUrl = "";
     server.use(
       http.get(`${BASE}/subscriptions`, ({ request }) => {
         capturedUrl = request.url;
-        return HttpResponse.json([SUB_RESPONSE]);
+        return HttpResponse.json(PAGE);
       }),
     );
-    await makeClient().subscriptions.list({ customer_id: "cust-1" });
-    expect(new URL(capturedUrl).searchParams.get("customer_id")).toBe("cust-1");
+    await makeClient().subscriptions.list({ customer_id: "cust-1", limit: 25, cursor: "Y3Vyc29y" });
+    const params = new URL(capturedUrl).searchParams;
+    expect(params.get("customer_id")).toBe("cust-1");
+    expect(params.get("limit")).toBe("25");
+    expect(params.get("cursor")).toBe("Y3Vyc29y");
   });
 });
 

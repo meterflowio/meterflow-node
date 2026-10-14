@@ -73,9 +73,9 @@ async function run() {
 
   // 5. List recent transactions
   console.log("5. Listing credit transactions...");
-  const txns = await client.credits.transactions(CUSTOMER_ID);
-  console.log(`   ✓ Found ${txns.length} transaction(s)`);
-  for (const tx of txns) {
+  const page = await client.credits.transactions(CUSTOMER_ID);
+  console.log(`   ✓ Found ${page.data.length} transaction(s) on the first page`);
+  for (const tx of page.data) {
     console.log(`     [${tx.transaction_type}] amount=${tx.amount} balance_after=${tx.balance_after}`);
   }
   console.log();

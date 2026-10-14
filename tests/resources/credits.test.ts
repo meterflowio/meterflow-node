@@ -147,26 +147,49 @@ describe("credits.balance", () => {
 });
 
 describe("credits.transactions", () => {
-  it("GET /credits/:customerId/transactions returns list", async () => {
-    server.use(http.get(`${BASE}/credits/cust-1/transactions`, () => HttpResponse.json([TX_RESPONSE])));
+  const PAGE = { data: [TX_RESPONSE], next_cursor: "Y3Vyc29y" };
+
+  it("GET /credits/:customerId/transactions returns a page, not a bare array", async () => {
+    server.use(http.get(`${BASE}/credits/cust-1/transactions`, () => HttpResponse.json(PAGE)));
 
     const result = await makeClient().credits.transactions("cust-1");
-    expect(result).toHaveLength(1);
-    expect(result[0]?.id).toBe("tx-1");
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0]?.id).toBe("tx-1");
+    expect(result.next_cursor).toBe("Y3Vyc29y");
   });
 
-  it("sends no query string — the endpoint returns the whole history in one response", async () => {
+  it("the last page says there is nothing after it", async () => {
+    server.use(http.get(`${BASE}/credits/cust-1/transactions`, () => HttpResponse.json({ data: [], next_cursor: null })));
+
+    const result = await makeClient().credits.transactions("cust-1");
+    expect(result.data).toEqual([]);
+    expect(result.next_cursor).toBeNull();
+  });
+
+  it("sends no query string when no page is asked for", async () => {
     let capturedUrl = "";
     server.use(
       http.get(`${BASE}/credits/cust-1/transactions`, ({ request }) => {
         capturedUrl = request.url;
-        return HttpResponse.json([TX_RESPONSE]);
+        return HttpResponse.json(PAGE);
       }),
     );
     await makeClient().credits.transactions("cust-1");
+    expect(new URL(capturedUrl).search).toBe("");
+  });
+
+  it("passes limit and cursor through as the API's own query parameters", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${BASE}/credits/cust-1/transactions`, ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json(PAGE);
+      }),
+    );
+    await makeClient().credits.transactions("cust-1", { limit: 25, cursor: "Y3Vyc29y" });
     const url = new URL(capturedUrl);
-    expect(url.search).toBe("");
-    expect([...url.searchParams.keys()]).toEqual([]);
+    expect(url.searchParams.get("limit")).toBe("25");
+    expect(url.searchParams.get("cursor")).toBe("Y3Vyc29y");
   });
 
   it("encodes special characters in customerId", async () => {
@@ -174,7 +197,7 @@ describe("credits.transactions", () => {
     server.use(
       http.get(`${BASE}/credits/cust%401/transactions`, ({ request }) => {
         capturedUrl = request.url;
-        return HttpResponse.json([TX_RESPONSE]);
+        return HttpResponse.json(PAGE);
       }),
     );
     await makeClient().credits.transactions("cust@1");

@@ -3,7 +3,9 @@ import { CreditsResource } from "./resources/credits";
 import { UsageResource } from "./resources/usage";
 import { SubscriptionsResource } from "./resources/subscriptions";
 import { PlansResource } from "./resources/plans";
+import { PortalResource } from "./resources/portal";
 import { EntitlementsResource } from "./resources/entitlements";
+import { WebhooksResource } from "./resources/webhooks";
 
 export interface MeterFlowOptions {
   apiKey: string;
@@ -27,7 +29,9 @@ export class MeterFlow {
   private _usage?: UsageResource;
   private _subscriptions?: SubscriptionsResource;
   private _plans?: PlansResource;
+  private _portal?: PortalResource;
   private _entitlements?: EntitlementsResource;
+  private _webhooks?: WebhooksResource;
 
   constructor(options: MeterFlowOptions) {
     if (!options.apiKey.startsWith("mf_live_") && !options.apiKey.startsWith("mf_test_")) {
@@ -42,6 +46,10 @@ export class MeterFlow {
       // called detached from window (Node tolerates it, so this only bites in the browser).
       fetch: options.fetch ?? globalThis.fetch.bind(globalThis),
     };
+  }
+
+  get portal(): PortalResource {
+    return (this._portal ??= new PortalResource(this));
   }
 
   get credits(): CreditsResource {
@@ -62,6 +70,11 @@ export class MeterFlow {
 
   get entitlements(): EntitlementsResource {
     return (this._entitlements ??= new EntitlementsResource(this));
+  }
+
+  /** Read-only: the endpoints registered for this project, and what we sent them. */
+  get webhooks(): WebhooksResource {
+    return (this._webhooks ??= new WebhooksResource(this));
   }
 
   /** @internal — used by resource classes only; not part of the public API */
