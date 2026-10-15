@@ -3,6 +3,24 @@
 Notable changes to `meterflow` (npm). Dates are the day the version was cut; what is published is
 in [the project roadmap](https://github.com/Donovantxy/MeterFlow/blob/main/docs/ROADMAP.md#where-we-are-2026-10-07).
 
+## 0.8.0 — 2026-10-15
+
+**`portal.createSession()` reads your project's defaults.** `topup_url`, `return_url` and
+`expires_in_minutes` are now settings on the project (set in the dashboard, under Portal), and a
+call that leaves one out uses the project's value instead of nothing. Passing a value still wins.
+If you were relying on "omitted means no Buy more button", set the project's checkout to empty.
+
+**`entitlements.get()` now answers with `plan_name`** beside `plan_id`, null exactly when `plan_id`
+is. A screen that shows a customer the plan they are on no longer has to follow the id with a
+second read to print one word.
+
+**`portal.createSession()` returns the link that customer already holds.** Calling it with only
+`customer_external_id`, while a link minted earlier is still valid, gives back **that** link rather
+than minting a second one — a customer has one live link, not a pile nobody can withdraw. Naming
+`topup_url`, `return_url` or `expires_in_minutes` is asking for a different link, and replaces it.
+The signature and the response shape are unchanged; only "every call is a fresh link" is no longer
+true.
+
 ## 0.7.1 — 2026-10-15
 
 **Fixed: the package now ships its types.** `0.5.0` through `0.7.0` built `dist/resources/*.d.ts`
