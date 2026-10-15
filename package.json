@@ -1,6 +1,6 @@
 {
   "name": "meterflow",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Official Node.js SDK for MeterFlow — usage-based billing, credit management, and metering.",
   "license": "MIT",
   "author": "MeterFlow",
@@ -32,10 +32,12 @@
   ],
   "scripts": {
     "prepublishOnly": "npm run build",
+    "verify:pack": "node scripts/check-pack.mjs",
     "build": "tsc --project tsconfig.json --emitDeclarationOnly && node scripts/build-fix.mjs && esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/index.mjs && esbuild src/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs && esbuild src/webhook.ts --bundle --platform=node --format=esm --outfile=dist/webhook.mjs && esbuild src/webhook.ts --bundle --platform=node --format=cjs --outfile=dist/webhook.cjs && node -e \"require('fs').copyFileSync('dist/index.cjs','dist/index.js')\"",
     "dev": "tsc --project tsconfig.json --watch",
     "quickstart": "npm run build && npx tsx examples/quickstart.ts",
     "typecheck": "tsc --noEmit",
+    "typecheck:examples": "tsc --noEmit -p examples/tsconfig.json",
     "lint": "eslint src tests",
     "lint:fix": "eslint src tests --fix",
     "format": "prettier --write src tests",
@@ -43,7 +45,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "generate:types": "openapi-typescript ../../docs/openapi.json -o src/types/openapi.d.ts",
+    "generate:types": "openapi-typescript ../../docs/openapi.json -o src/types/openapi.d.ts --default-non-nullable=false",
     "ci:types-check": "npm run generate:types && git diff --exit-code src/types/openapi.d.ts"
   },
   "devDependencies": {

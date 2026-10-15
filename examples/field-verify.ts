@@ -110,8 +110,8 @@ async function roundTrip() {
   const totalEvents = summary.meters.reduce((sum, meter) => sum + meter.event_count, 0);
   report(totalEvents === 3, "summary sees all 3 events", summary.meters.map((meter) => `${meter.meter_name}: value=${meter.value} events=${meter.event_count}`).join("; "));
 
-  const transactions = await timed("credits.transactions", () => client.credits.transactions(CUSTOMER_ID));
-  report(transactions.length >= 2, "transactions listed (grant + deduct)", `count=${transactions.length}`);
+  const ledger = await timed("credits.transactions", () => client.credits.transactions(CUSTOMER_ID));
+  report(ledger.data.length >= 2, "transactions listed (grant + deduct)", `count=${ledger.data.length} next_cursor=${ledger.next_cursor}`);
 }
 
 async function idempotentReplay() {

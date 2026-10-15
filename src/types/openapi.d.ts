@@ -345,6 +345,71 @@ export interface paths {
         patch: operations["update"];
         trace?: never;
     };
+    "/api/v1/organizations/{org_id}/projects/{project_id}/portal-branding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How this project's hosted balance portal looks */
+        get: operations["getPortalBranding"];
+        /**
+         * Replace how this project's hosted balance portal looks
+         * @description A replace, not a patch: a field left out is cleared, so an empty body resets the page to
+         *     MeterFlow's own look.
+         */
+        put: operations["updatePortalBranding"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/projects/{project_id}/portal-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What this project's portal links are for when the mint does not say */
+        get: operations["getPortalLinkDefaults"];
+        /**
+         * Replace what this project's portal links are for
+         * @description A replace, not a patch: a field left out is cleared, so an empty body sends every later link
+         *     back to no checkout, no Back link and the mint's own 60 minutes.
+         */
+        put: operations["updatePortalLinkDefaults"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/projects/{project_id}/portal-branding/all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Give every project in this organization the same portal look
+         * @description The same body and the same answer as the single-project write, applied to every project of
+         *     the organization — including ones that had settings of their own, which it replaces.
+         */
+        put: operations["updatePortalBrandingForAll"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations/{org_id}/projects/{project_id}/api-keys": {
         parameters: {
             query?: never;
@@ -1071,6 +1136,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/customers/{customer_external_id}/portal-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The portal link this customer currently holds, or null when there is none
+         * @description A read, and only a read: it mints nothing, so a screen showing a link cannot create one just
+         *     by being looked at. `null` means this customer has no link, or the one they had has expired.
+         */
+        get: operations["portalLink"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/search": {
         parameters: {
             query?: never;
@@ -1223,8 +1309,8 @@ export interface paths {
         };
         /**
          * What this portal link is for — read with the link's own token
-         * @description Everything the page may know. The project is not among it: an end user has no use for it,
-         *     and a page cannot leak what it was never told.
+         * @description Everything the page may know, branding included. The project is not among it: an end user
+         *     has no use for it, and a page cannot leak what it was never told.
          */
         get: operations["me"];
         put?: never;
@@ -1265,6 +1351,44 @@ export interface paths {
          *     customer it is for, so a link cannot be pointed at a second one.
          */
         get: operations["transactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/entitlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What this link's customer is on, and how much of each allowance is left
+         * @description The plan and its allowances for the one customer the token names. Like every portal read, it
+         *     takes no customer id, so a link cannot be pointed at a second one.
+         */
+        get: operations["entitlements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/portal/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What this link's customer has recorded, per meter */
+        get: operations["portalUsage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1374,7 +1498,7 @@ export interface components {
              * Environment
              * @default live
              */
-            environment: string;
+            environment?: string;
             /** Name */
             name: string;
         };
@@ -1554,19 +1678,19 @@ export interface components {
              * Environment
              * @default live
              */
-            environment: string;
+            environment?: string;
             /** Webhook Secret */
             webhook_secret: string;
             /**
              * Is Enabled
              * @default true
              */
-            is_enabled: boolean;
+            is_enabled?: boolean;
             /**
              * Metadata
              * @default {}
              */
-            metadata: {
+            metadata?: {
                 [key: string]: unknown;
             };
         };
@@ -1681,7 +1805,7 @@ export interface components {
              * Received
              * @default true
              */
-            received: boolean;
+            received?: boolean;
             /**
              * Status
              * @enum {string}
@@ -1737,7 +1861,7 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: {
+            metadata?: {
                 [key: string]: unknown;
             };
         };
@@ -1755,7 +1879,7 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: {
+            metadata?: {
                 [key: string]: unknown;
             };
         };
@@ -1871,7 +1995,7 @@ export interface components {
              * Environment
              * @default live
              */
-            environment: string;
+            environment?: string;
         };
         /** EmailVerificationConfirm */
         EmailVerificationConfirm: {
@@ -1923,6 +2047,8 @@ export interface components {
             subscription_id: string | null;
             /** Plan Id */
             plan_id: string | null;
+            /** Plan Name */
+            plan_name: string | null;
             /** Period End */
             period_end: string | null;
             /** Entitlements */
@@ -1957,7 +2083,7 @@ export interface components {
              * Quantity
              * @default 1
              */
-            quantity: number;
+            quantity?: number;
         };
         /**
          * EventPackResponse
@@ -2011,7 +2137,7 @@ export interface components {
              * @default member
              * @enum {string}
              */
-            role: "admin" | "member" | "viewer";
+            role?: "admin" | "member" | "viewer";
         };
         /**
          * LimitType
@@ -2049,7 +2175,7 @@ export interface components {
             /** Event Name */
             event_name: string;
             /** @default count */
-            aggregation_type: components["schemas"]["AggregationType"];
+            aggregation_type?: components["schemas"]["AggregationType"];
             /** Aggregation Field */
             aggregation_field?: string | null;
             /**
@@ -2057,7 +2183,7 @@ export interface components {
              * @description Not implemented: must be empty. A meter counts every event carrying its `event_name`.
              * @default {}
              */
-            filter_conditions: {
+            filter_conditions?: {
                 [key: string]: unknown;
             };
             /** Description */
@@ -2066,7 +2192,7 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: {
+            metadata?: {
                 [key: string]: unknown;
             };
         };
@@ -2288,44 +2414,44 @@ export interface components {
             /** Description */
             description?: string | null;
             /** @default monthly */
-            billing_period: components["schemas"]["BillingPeriod"];
+            billing_period?: components["schemas"]["BillingPeriod"];
             /**
              * Price
              * @default 0
              */
-            price: number | string;
+            price?: number | string;
             /**
              * Currency
              * @default USD
              */
-            currency: string;
+            currency?: string;
             /**
              * Trial Days
              * @default 0
              */
-            trial_days: number;
+            trial_days?: number;
             /**
              * Is Published
              * @default true
              */
-            is_published: boolean;
+            is_published?: boolean;
             /**
              * Metadata
              * @default {}
              */
-            metadata: {
+            metadata?: {
                 [key: string]: unknown;
             };
             /**
              * Meter Limits
              * @default []
              */
-            meter_limits: components["schemas"]["PlanMeterLimitCreateRequest"][];
+            meter_limits?: components["schemas"]["PlanMeterLimitCreateRequest"][];
             /**
              * Features
              * @default []
              */
-            features: string[];
+            features?: string[];
         };
         /** PlanMeterLimitCreateRequest */
         PlanMeterLimitCreateRequest: {
@@ -2339,7 +2465,7 @@ export interface components {
             /** Overage Rate */
             overage_rate?: number | string | null;
             /** @default hard */
-            limit_type: components["schemas"]["LimitType"];
+            limit_type?: components["schemas"]["LimitType"];
         };
         /** PlanMeterLimitResponse */
         PlanMeterLimitResponse: {
@@ -2428,32 +2554,32 @@ export interface components {
              * Active
              * @default 0
              */
-            active: number;
+            active?: number;
             /**
              * Trialing
              * @default 0
              */
-            trialing: number;
+            trialing?: number;
             /**
              * Past Due
              * @default 0
              */
-            past_due: number;
+            past_due?: number;
             /**
              * Paused
              * @default 0
              */
-            paused: number;
+            paused?: number;
             /**
              * Canceled
              * @default 0
              */
-            canceled: number;
+            canceled?: number;
             /**
              * Expired
              * @default 0
              */
-            expired: number;
+            expired?: number;
         };
         /** PlanSubscriptionsItem */
         PlanSubscriptionsItem: {
@@ -2588,6 +2714,48 @@ export interface components {
             total_credits_deducted: string;
         };
         /**
+         * PortalBranding
+         * @description How one project's portal page looks to its end customers.
+         *
+         *     Both the body of `PUT …/portal-branding` and what every read of it answers with: the shape a
+         *     tenant sets is the shape they get back. Every field is optional and every unset field means
+         *     "MeterFlow's own", so `{}` is a valid, complete setting and the way to reset one.
+         *
+         *     The colours become CSS custom properties on the portal page, named after the thing they paint
+         *     rather than after the variable — a tenant choosing them is looking at a page, not at a
+         *     stylesheet.
+         */
+        PortalBranding: {
+            /** Company Name */
+            company_name?: string | null;
+            /** Logo Url */
+            logo_url?: string | null;
+            /**
+             * Theme
+             * @default auto
+             * @enum {string}
+             */
+            theme?: "auto" | "light" | "dark";
+            /** Page Background */
+            page_background?: string | null;
+            /** Card Background */
+            card_background?: string | null;
+            /** Button Background */
+            button_background?: string | null;
+            /** Title Color */
+            title_color?: string | null;
+            /** Text Color */
+            text_color?: string | null;
+            /** Button Text Color */
+            button_text_color?: string | null;
+            /** Link Color */
+            link_color?: string | null;
+            /** Border Color */
+            border_color?: string | null;
+            /** Border Radius Px */
+            border_radius_px?: number | null;
+        };
+        /**
          * PortalContextResponse
          * @description What the page itself needs before it renders: who this is for, how long it has, and the two
          *     links the tenant chose. No key, no project id, nothing about any other customer.
@@ -2606,6 +2774,27 @@ export interface components {
             return_url?: string | null;
             /** Topup Url */
             topup_url?: string | null;
+            branding: components["schemas"]["PortalBranding"];
+        };
+        /**
+         * PortalLinkDefaults
+         * @description What every link this project mints is for, when the mint does not say otherwise.
+         *
+         *     `topup_url` and `return_url` are the tenant's checkout and the tenant's app: the same two
+         *     addresses for every customer of one product, so they are the project's setting and only the
+         *     customer differs per link. Both the body of `PUT …/portal-links` and what every read answers
+         *     with, replace-not-merge like the branding pair, and `{}` is how a tenant clears them.
+         *
+         *     Kept out of `PortalBranding` on purpose: branding can be copied onto every project of an
+         *     organization and a checkout URL must not be — one product's checkout is not another's.
+         */
+        PortalLinkDefaults: {
+            /** Topup Url */
+            topup_url?: string | null;
+            /** Return Url */
+            return_url?: string | null;
+            /** Expires In Minutes */
+            expires_in_minutes?: number | null;
         };
         /**
          * PortalLinkRequest
@@ -2866,22 +3055,22 @@ export interface components {
              * Customers
              * @default []
              */
-            customers: components["schemas"]["SearchHit"][];
+            customers?: components["schemas"]["SearchHit"][];
             /**
              * Api Keys
              * @default []
              */
-            api_keys: components["schemas"]["SearchHit"][];
+            api_keys?: components["schemas"]["SearchHit"][];
             /**
              * Meters
              * @default []
              */
-            meters: components["schemas"]["SearchHit"][];
+            meters?: components["schemas"]["SearchHit"][];
             /**
              * Plans
              * @default []
              */
-            plans: components["schemas"]["SearchHit"][];
+            plans?: components["schemas"]["SearchHit"][];
         };
         /** SubscriptionCreateRequest */
         SubscriptionCreateRequest: {
@@ -2902,7 +3091,7 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: {
+            metadata?: {
                 [key: string]: unknown;
             };
             /** Idempotency Key */
@@ -3022,12 +3211,12 @@ export interface components {
              * Expires In
              * @default 720
              */
-            expires_in: number;
+            expires_in?: number;
             /**
              * Token Type
              * @default bearer
              */
-            token_type: string;
+            token_type?: string;
         };
         /** UsageAnalyticsResponse */
         UsageAnalyticsResponse: {
@@ -3079,7 +3268,7 @@ export interface components {
              * Properties
              * @default {}
              */
-            properties: {
+            properties?: {
                 [key: string]: unknown;
             };
             /** Idempotency Key */
@@ -3227,7 +3416,7 @@ export interface components {
              * Is Superuser
              * @default false
              */
-            is_superuser: boolean;
+            is_superuser?: boolean;
             /** Avatar Url */
             avatar_url?: string | null;
             /**
@@ -3266,7 +3455,7 @@ export interface components {
              * Received
              * @default true
              */
-            received: boolean;
+            received?: boolean;
             /**
              * Status
              * @enum {string}
@@ -3295,7 +3484,7 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: {
+            metadata?: {
                 [key: string]: unknown;
             };
         };
@@ -4206,6 +4395,178 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    getPortalBranding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBranding"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    updatePortalBranding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PortalBranding"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBranding"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    getPortalLinkDefaults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalLinkDefaults"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    updatePortalLinkDefaults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PortalLinkDefaults"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalLinkDefaults"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    updatePortalBrandingForAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PortalBranding"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalBranding"];
                 };
             };
             /** @description Validation Error */
@@ -5925,6 +6286,40 @@ export interface operations {
             };
         };
     };
+    portalLink: {
+        parameters: {
+            query: {
+                project_id: string;
+                environment?: string;
+            };
+            header?: never;
+            path: {
+                customer_external_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortalLinkResponse"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     search: {
         parameters: {
             query: {
@@ -6386,6 +6781,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    entitlements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntitlementsResponse"];
+                };
+            };
+        };
+    };
+    portalUsage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageSummaryResponse"];
                 };
             };
         };

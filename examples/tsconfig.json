@@ -1,3 +1,8 @@
+// The examples are type-checked, never emitted: the root tsconfig excludes this directory so
+// `tsc --emitDeclarationOnly` cannot put them in dist/, and `npm run typecheck:examples` points
+// here instead. They import `meterflow` by name, which npm self-reference resolves through the
+// package's own `exports` to dist/ — the same declarations a consumer gets — so this runs AFTER
+// `npm run build` (docs/DECISIONS.md, 2026-10-15).
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
