@@ -15,9 +15,12 @@ export interface MeterFlowOptions {
   fetch?: typeof globalThis.fetch;
 }
 
+/** One query parameter's value: a list is sent as the key repeated once per item; `undefined` and `null` are not sent. */
+export type QueryValue = string | number | boolean | readonly (string | number | boolean)[] | null | undefined;
+
 export interface RequestOptions {
   body?: unknown;
-  query?: Record<string, string | number | boolean>;
+  query?: Record<string, QueryValue>;
   idempotencyKey?: string;
   timeout?: number;
 }

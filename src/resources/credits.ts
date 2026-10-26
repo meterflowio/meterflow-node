@@ -18,7 +18,8 @@ export interface DeductOptions {
 /** One page of a list: how many rows, and where to carry on from. */
 export interface PageQuery {
   limit?: number;
-  cursor?: string;
+  /** `next_cursor` from the previous page; omit it, or pass null, for the first page. */
+  cursor?: string | null;
 }
 
 export class CreditsResource {

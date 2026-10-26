@@ -97,6 +97,44 @@ describe("subscriptions.list", () => {
     expect(params.get("limit")).toBe("25");
     expect(params.get("cursor")).toBe("Y3Vyc29y");
   });
+
+  it("passes q and repeats status once per value", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${BASE}/subscriptions`, ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json(PAGE);
+      }),
+    );
+    await makeClient().subscriptions.list({ q: "acme", status: ["past_due", "paused"] });
+    const params = new URL(capturedUrl).searchParams;
+    expect(params.get("q")).toBe("acme");
+    expect(params.getAll("status")).toEqual(["past_due", "paused"]);
+  });
+
+  it("leaves out a filter that is undefined rather than sending the word", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${BASE}/subscriptions`, ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json(PAGE);
+      }),
+    );
+    await makeClient().subscriptions.list({ limit: 200, customer_id: undefined, cursor: undefined });
+    expect([...new URL(capturedUrl).searchParams.keys()]).toEqual(["limit"]);
+  });
+
+  it("leaves out a cursor that is null, so the last page's next_cursor can be passed straight back", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${BASE}/subscriptions`, ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json(PAGE);
+      }),
+    );
+    await makeClient().subscriptions.list({ limit: 200, cursor: null });
+    expect([...new URL(capturedUrl).searchParams.keys()]).toEqual(["limit"]);
+  });
 });
 
 describe("subscriptions.get", () => {

@@ -1,8 +1,17 @@
-import type { MeterFlow } from "../client";
+import type { MeterFlow, QueryValue } from "../client";
 import type { components } from "../types/openapi";
 
 type WebhookResponse = components["schemas"]["WebhookResponse"];
 type WebhookDeliveryResponse = components["schemas"]["WebhookDeliveryResponse"];
+type WebhookDeliveryPage = components["schemas"]["WebhookDeliveryPage"];
+
+/** Which page of an endpoint's delivery attempts to read. */
+export interface DeliveryPageQuery {
+  /** Rows per page, 1–200 (50 by default). */
+  limit?: number;
+  /** `next_cursor` from the previous page; omit it, or pass null, for the first page. */
+  cursor?: string | null;
+}
 
 /**
  * Webhook **receipts** — read-only on purpose.
@@ -32,5 +41,20 @@ export class WebhooksResource {
    */
   deliveries(webhookId: string): Promise<WebhookDeliveryResponse[]> {
     return this.client.request<WebhookDeliveryResponse[]>("GET", `webhooks/${encodeURIComponent(webhookId)}/deliveries`);
+  }
+
+  /**
+   * One page of an endpoint's delivery attempts, newest first, with no cap on how far back it reads:
+   * the same rows as `deliveries()`, in the environment of the key.
+   *
+   * `data` holds the rows and `next_cursor` the mark for the page after this one (`null` on the
+   * last). Pass it back as `cursor` unchanged; it is opaque.
+   * webhookId: the endpoint whose receipts are read.
+   * query: the page size and the cursor of the page before; omit it for the first page.
+   */
+  deliveryPage(webhookId: string, query?: DeliveryPageQuery): Promise<WebhookDeliveryPage> {
+    return this.client.request<WebhookDeliveryPage>("GET", `webhooks/${encodeURIComponent(webhookId)}/deliveries/page`, {
+      ...(query !== undefined && { query: query as Record<string, QueryValue> }),
+    });
   }
 }

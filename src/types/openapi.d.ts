@@ -238,6 +238,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizations/invitations/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept an invitation */
+        post: operations["acceptInvitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations": {
         parameters: {
             query?: never;
@@ -298,11 +315,64 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** List members */
+        get: operations["listMembers"];
         put?: never;
         /** Invite member */
         post: operations["invite"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a member */
+        delete: operations["removeMember"];
+        options?: never;
+        head?: never;
+        /** Change a member's role */
+        patch: operations["changeMemberRole"];
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List pending invitations */
+        get: operations["listInvitations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{org_id}/invitations/{invitation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke an invitation */
+        delete: operations["revokeInvitation"];
         options?: never;
         head?: never;
         patch?: never;
@@ -779,6 +849,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/webhooks/{webhook_id}/deliveries/page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Delivery attempts for a webhook, newest first, one page at a time (JWT or API key; an API key sees only its own environment)
+         * @description The same receipts as `/deliveries`, paged with a cursor instead of cut at the newest 100.
+         *
+         *     A webhook in another project answers 404, never 403.
+         */
+        get: operations["listDeliveryPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/analytics/usage": {
         parameters: {
             query?: never;
@@ -909,6 +1001,363 @@ export interface paths {
         get: operations["admin_list_users"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/flagged-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Accounts that may need a hand (cross-tenant) */
+        get: operations["admin_list_flagged_accounts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all tenant subscriptions (cross-tenant) */
+        get: operations["admin_list_subscriptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/billing-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List MeterFlow's own Paddle webhook events */
+        get: operations["admin_list_billing_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/connector-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tenants' payment-provider webhook events (cross-tenant) */
+        get: operations["admin_list_connector_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{project_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One project's meters, plans, connectors and webhook endpoints, read-only */
+        get: operations["admin_get_project"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{project_id}/webhook-deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One project's webhook deliveries across its endpoints, newest first */
+        get: operations["admin_list_project_webhook_deliveries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{project_id}/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One project's customers in both environments, most recently active first */
+        get: operations["admin_list_project_customers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{project_id}/usage-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One project's usage events in both environments, newest first, with what the worker billed for each */
+        get: operations["admin_list_project_usage_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{project_id}/api-keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List one project's API keys, without dashboard session keys */
+        get: operations["admin_list_project_api_keys"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/audit-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What operators did from the console, newest first */
+        get: operations["admin_list_audit_log"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/organizations/{org_id}/tier": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Set an organization's MeterFlow tier */
+        post: operations["admin_set_organization_tier"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/organizations/{org_id}/billing-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Set an organization's MeterFlow billing status */
+        post: operations["admin_set_organization_billing_status"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/credits/adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Grant or take a tenant's customer's credits through the tenant's ledger */
+        post: operations["admin_adjust_credits"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/subscriptions/{subscription_id}/extend-trial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Push a trialing subscription's trial end further out */
+        post: operations["admin_extend_trial"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark a user's email verified */
+        post: operations["admin_verify_user_email"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}/password-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Email a user a password-reset link */
+        post: operations["admin_send_password_reset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Let a deactivated user log in again */
+        post: operations["admin_reactivate_user"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{project_id}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Switch a deactivated project back on */
+        post: operations["admin_reactivate_project"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/api-keys/{key_id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke a tenant's API key */
+        post: operations["admin_revoke_api_key"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/webhooks/{webhook_id}/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Switch a tenant's webhook endpoint off; switching it back on is the tenant's */
+        post: operations["admin_disable_webhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/connectors/{connector_id}/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Switch a tenant's payment-provider connector off; switching it back on is the tenant's */
+        post: operations["admin_disable_connector"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1253,7 +1702,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** A connector's delivery log, newest first */
+        /** A connector's delivery log, newest first, one page at a time */
         get: operations["listEvents"];
         put?: never;
         post?: never;
@@ -1402,6 +1851,481 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
+         * AcceptInvitationRequest
+         * @description Accept an invitation as the logged-in user.
+         */
+        AcceptInvitationRequest: {
+            /**
+             * Token
+             * @description The token from the invitation email's link.
+             */
+            token: string;
+        };
+        /**
+         * AdminActionRequest
+         * @description The body every admin action takes: why the operator is doing it.
+         */
+        AdminActionRequest: {
+            /**
+             * Reason
+             * @description Why, in the operator's words; kept in the audit row's details.
+             */
+            reason?: string | null;
+        };
+        /**
+         * AdminAdjustCreditsRequest
+         * @description Grant credits to, or take them from, one of a tenant's customers, through the tenant's own ledger.
+         */
+        AdminAdjustCreditsRequest: {
+            /**
+             * Reason
+             * @description Why, in the operator's words; kept in the audit row's details.
+             */
+            reason?: string | null;
+            /**
+             * Project Id
+             * Format: uuid
+             * @description The tenant's project the customer belongs to.
+             */
+            project_id: string;
+            /**
+             * Customer External Id
+             * @description The tenant's own id for the customer.
+             */
+            customer_external_id: string;
+            /**
+             * Environment
+             * @description live or test: which of the project's two ledgers to write.
+             * @enum {string}
+             */
+            environment: "live" | "test";
+            /**
+             * Amount
+             * @description Credits to add; a negative amount takes them away. Never zero.
+             */
+            amount: number | string;
+        };
+        /**
+         * AdminAuditLogPage
+         * @description One page of the operators' audit log, newest first; pass `next_cursor` back as `cursor` for the next.
+         */
+        AdminAuditLogPage: {
+            /**
+             * Data
+             * @description The page's rows.
+             */
+            data: components["schemas"]["AdminAuditLogResponse"][];
+            /**
+             * Next Cursor
+             * @description The mark for the page after this one, opaque; null on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /**
+         * AdminAuditLogResponse
+         * @description One action an operator took from the admin console: who, what, on whom, when.
+         */
+        AdminAuditLogResponse: {
+            /**
+             * Id
+             * Format: uuid
+             * @description The row's id.
+             */
+            id: string;
+            /**
+             * Actor User Id
+             * @description The operator who acted; null once their account is deleted.
+             */
+            actor_user_id: string | null;
+            /**
+             * Actor Email
+             * @description That operator's email; null whenever actor_user_id is.
+             */
+            actor_email: string | null;
+            /**
+             * Action
+             * @description What was done, e.g. organization.set_tier or credits.adjust.
+             */
+            action: string;
+            /**
+             * Target Type
+             * @description The kind of thing acted on.
+             * @enum {string}
+             */
+            target_type: "organization" | "user" | "project" | "subscription" | "customer" | "api_key" | "webhook" | "connector";
+            /**
+             * Target Id
+             * @description Its id; for a customer, the tenant's own id for them.
+             */
+            target_id: string;
+            /**
+             * Organization Id
+             * @description The tenant touched; null for a user who belongs to none, or once it is deleted.
+             */
+            organization_id: string | null;
+            /**
+             * Organization Name
+             * @description That organization's name; null whenever organization_id is.
+             */
+            organization_name: string | null;
+            /**
+             * Details
+             * @description target_name (the email or name acted on, as it was), before / after values, reason, and the action's own inputs.
+             */
+            details: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             * @description When it was done.
+             */
+            created_at: string;
+        };
+        /**
+         * AdminBillingEventPage
+         * @description One page of MeterFlow's own Paddle webhook events, newest first; pass `next_cursor` back as `cursor` for the next.
+         */
+        AdminBillingEventPage: {
+            /**
+             * Data
+             * @description The page's rows.
+             */
+            data: components["schemas"]["AdminBillingEventResponse"][];
+            /**
+             * Next Cursor
+             * @description The mark for the page after this one, opaque; null on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /**
+         * AdminBillingEventResponse
+         * @description One webhook from MeterFlow's own Paddle account, and what the receiver did with it.
+         */
+        AdminBillingEventResponse: {
+            /**
+             * Id
+             * Format: uuid
+             * @description The row's id.
+             */
+            id: string;
+            /**
+             * Provider
+             * @description The billing provider that sent it (paddle).
+             */
+            provider: string;
+            /**
+             * Event Id
+             * @description The provider's own id for the event, as its dashboard shows it.
+             */
+            event_id: string;
+            /**
+             * Event Type
+             * @description The provider's event name, e.g. subscription.updated.
+             */
+            event_type: string;
+            /**
+             * Organization Id
+             * @description The organization it applied to; null when none matched.
+             */
+            organization_id: string | null;
+            /**
+             * Organization Name
+             * @description That organization's name; null whenever organization_id is.
+             */
+            organization_name: string | null;
+            /**
+             * Status
+             * @description processed (applied), ignored (recorded only) or error.
+             */
+            status: string;
+            /**
+             * Detail
+             * @description The receiver's sentence on what it did, when it wrote one.
+             */
+            detail: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             * @description When the provider says the event happened.
+             */
+            occurred_at: string;
+            /**
+             * Received At
+             * Format: date-time
+             * @description When our receiver got it.
+             */
+            received_at: string;
+            /**
+             * Request Id
+             * @description The id of the request that delivered it, as its log lines carry it; null on older events.
+             */
+            request_id: string | null;
+        };
+        /**
+         * AdminConnectorEventPage
+         * @description One page of tenants' payment-provider webhook events, newest first; pass `next_cursor` back as `cursor` for the next.
+         */
+        AdminConnectorEventPage: {
+            /**
+             * Data
+             * @description The page's rows.
+             */
+            data: components["schemas"]["AdminConnectorEventResponse"][];
+            /**
+             * Next Cursor
+             * @description The mark for the page after this one, opaque; null on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /**
+         * AdminConnectorEventResponse
+         * @description One webhook from a tenant's own payment provider, and what the receiver did with it.
+         */
+        AdminConnectorEventResponse: {
+            /**
+             * Id
+             * Format: uuid
+             * @description The row's id.
+             */
+            id: string;
+            /**
+             * Connector Id
+             * Format: uuid
+             * @description The connector that received it.
+             */
+            connector_id: string;
+            /**
+             * Provider
+             * @description The tenant's provider: paddle, polar, lemon_squeezy, chargebee or razorpay.
+             */
+            provider: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             * @description The organization the connector's project belongs to.
+             */
+            organization_id: string;
+            /**
+             * Organization Name
+             * @description That organization's name.
+             */
+            organization_name: string;
+            /**
+             * Project Id
+             * Format: uuid
+             * @description The project the connector is on.
+             */
+            project_id: string;
+            /**
+             * Project Name
+             * @description That project's name.
+             */
+            project_name: string;
+            /**
+             * Event Id
+             * @description The provider's own id for the event.
+             */
+            event_id: string;
+            /**
+             * Event Type
+             * @description The provider's event name.
+             */
+            event_type: string;
+            /**
+             * Status
+             * @description processed (applied to a subscription or ledger) or ignored (nothing to do).
+             */
+            status: string;
+            /**
+             * Detail
+             * @description The receiver's sentence on what it did, as the tenant's delivery log shows it.
+             */
+            detail: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             * @description When the provider says the event happened.
+             */
+            occurred_at: string;
+            /**
+             * Received At
+             * Format: date-time
+             * @description When our receiver got it.
+             */
+            received_at: string;
+            /**
+             * Request Id
+             * @description The id of the request that delivered it, as its log lines carry it; null on older events.
+             */
+            request_id: string | null;
+        };
+        /**
+         * AdminConnectorResponse
+         * @description A tenant's payment-provider connector with its price→plan mappings; never its webhook secret.
+         */
+        AdminConnectorResponse: {
+            /**
+             * Created By
+             * @description The user who created it; null for rows older than this field, and once that user is deleted.
+             */
+            created_by: string | null;
+            /**
+             * Created By Email
+             * @description The creator's account email, so a list can name them without a user lookup; null whenever created_by is.
+             */
+            created_by_email: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Provider */
+            provider: string;
+            /** Environment */
+            environment: string;
+            /** Secret Hint */
+            secret_hint: string;
+            /** Is Enabled */
+            is_enabled: boolean;
+            /** Metadata */
+            metadata_: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Price Mappings
+             * @description The connector's price→plan mappings, newest first.
+             */
+            price_mappings: components["schemas"]["AdminPriceMappingResponse"][];
+        };
+        /**
+         * AdminCustomerPage
+         * @description One page of a project's customers, most recently active first; pass `next_cursor` back as `cursor` for the next.
+         */
+        AdminCustomerPage: {
+            /**
+             * Data
+             * @description The page's rows.
+             */
+            data: components["schemas"]["AdminCustomerResponse"][];
+            /**
+             * Next Cursor
+             * @description The mark for the page after this one, opaque; null on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /**
+         * AdminCustomerResponse
+         * @description One of a project's end customers in one environment.
+         */
+        AdminCustomerResponse: {
+            /** Customer External Id */
+            customer_external_id: string;
+            /** Subscription Status */
+            subscription_status: string | null;
+            /** Plan Id */
+            plan_id: string | null;
+            /** Plan Name */
+            plan_name: string | null;
+            /** Balance */
+            balance: string | null;
+            /** Event Count */
+            event_count: number;
+            /**
+             * First Seen At
+             * Format: date-time
+             */
+            first_seen_at: string;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /**
+             * Environment
+             * @description live or test: the data world the customer's rows are in.
+             */
+            environment: string;
+        };
+        /**
+         * AdminExtendTrialRequest
+         * @description Push a trialing subscription's trial end further out.
+         */
+        AdminExtendTrialRequest: {
+            /**
+             * Reason
+             * @description Why, in the operator's words; kept in the audit row's details.
+             */
+            reason?: string | null;
+            /**
+             * Days
+             * @description How many days to add to the trial's end.
+             */
+            days: number;
+        };
+        /**
+         * AdminFlaggedAccountResponse
+         * @description An account that may need a hand, ordered by how urgently: a usage backlog first, unverified users last.
+         */
+        AdminFlaggedAccountResponse: {
+            /**
+             * Kind
+             * @description Why it is flagged: usage_backlog, past_due, webhook_failures, quota_warning or unverified_user.
+             * @enum {string}
+             */
+            kind: "usage_backlog" | "past_due" | "webhook_failures" | "quota_warning" | "unverified_user";
+            /**
+             * Organization Id
+             * @description The organization concerned; null for an unverified user who owns none.
+             */
+            organization_id: string | null;
+            /**
+             * Organization Name
+             * @description That organization's name; null whenever organization_id is.
+             */
+            organization_name: string | null;
+            /**
+             * Project Id
+             * @description For usage_backlog, the project whose events wait; null for the other kinds.
+             */
+            project_id: string | null;
+            /**
+             * Project Name
+             * @description That project's name; null whenever project_id is.
+             */
+            project_name: string | null;
+            /**
+             * Since
+             * @description Since when the condition holds, when our data records it; null when it does not.
+             */
+            since: string | null;
+            /**
+             * Detail
+             * @description What exactly, in a sentence: events waiting, days past due, failed deliveries, the warning sent, the user's email.
+             */
+            detail: string;
+            /**
+             * Request Id
+             * @description For webhook_failures, the id of the request that caused the latest failed delivery that has one; null for the other kinds and when no failed delivery in the window has one.
+             */
+            request_id: string | null;
+        };
+        /**
          * AdminOrganizationResponse
          * @description Organization plus rollup counts — one row per org across the whole platform.
          */
@@ -1417,15 +2341,108 @@ export interface components {
             slug: string;
             /** Billing Email */
             billing_email: string | null;
+            /**
+             * Tier
+             * @description The organization's MeterFlow tier: drip, flow, stream or torrent.
+             */
+            tier: string;
+            /**
+             * Billing Status
+             * @description Its MeterFlow billing status: none, trialing, active, past_due or canceled.
+             */
+            billing_status: string;
             /** Member Count */
             member_count: number;
             /** Project Count */
             project_count: number;
             /**
+             * Owner User Id
+             * @description The organization's owner: the earliest owner membership; null once that user is deleted and no other owner exists.
+             */
+            owner_user_id: string | null;
+            /**
+             * Owner Email
+             * @description That owner's email; null whenever owner_user_id is.
+             */
+            owner_email: string | null;
+            /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * AdminPriceMappingResponse
+         * @description One of the provider's price ids and the plan a payment for it puts the customer on.
+         */
+        AdminPriceMappingResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Connector Id
+             * Format: uuid
+             */
+            connector_id: string;
+            /** Provider Price Id */
+            provider_price_id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Plan Name
+             * @description The name of the plan the price maps to.
+             */
+            plan_name: string;
+        };
+        /**
+         * AdminProjectDetailResponse
+         * @description One project's configuration as its tenant set it: meters, plans, connectors and webhook endpoints; and its usage backlog.
+         */
+        AdminProjectDetailResponse: {
+            /** @description The project itself. */
+            project: components["schemas"]["AdminProjectResponse"];
+            /**
+             * Organization Name
+             * @description The name of the organization the project belongs to.
+             */
+            organization_name: string;
+            /**
+             * Meters
+             * @description The project's meters, newest first.
+             */
+            meters: components["schemas"]["MeterResponse"][];
+            /**
+             * Plans
+             * @description The project's plans, drafts included, newest first, with their limits and features.
+             */
+            plans: components["schemas"]["PlanResponse"][];
+            /**
+             * Connectors
+             * @description The project's payment-provider connectors, newest first.
+             */
+            connectors: components["schemas"]["AdminConnectorResponse"][];
+            /**
+             * Webhooks
+             * @description The project's webhook endpoints, newest first; never their signing secret.
+             */
+            webhooks: components["schemas"]["WebhookResponse"][];
+            /** @description The project's usage events still waiting for the worker. */
+            usage_backlog: components["schemas"]["AdminUsageBacklogResponse"];
         };
         /**
          * AdminProjectResponse
@@ -1453,6 +2470,226 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * AdminSetBillingStatusRequest
+         * @description Set an organization's MeterFlow billing status by hand.
+         */
+        AdminSetBillingStatusRequest: {
+            /**
+             * Reason
+             * @description Why, in the operator's words; kept in the audit row's details.
+             */
+            reason?: string | null;
+            /** @description The status to set: none, trialing, active, past_due or canceled. */
+            billing_status: components["schemas"]["BillingStatus"];
+        };
+        /**
+         * AdminSetTierRequest
+         * @description Move an organization to another MeterFlow tier.
+         */
+        AdminSetTierRequest: {
+            /**
+             * Reason
+             * @description Why, in the operator's words; kept in the audit row's details.
+             */
+            reason?: string | null;
+            /** @description The tier to set: drip, flow, stream or torrent. */
+            tier: components["schemas"]["PlatformTier"];
+        };
+        /**
+         * AdminSubscriptionPage
+         * @description One page of tenant subscriptions, newest first; pass `next_cursor` back as `cursor` for the next.
+         */
+        AdminSubscriptionPage: {
+            /**
+             * Data
+             * @description The page's rows.
+             */
+            data: components["schemas"]["AdminSubscriptionResponse"][];
+            /**
+             * Next Cursor
+             * @description The mark for the page after this one, opaque; null on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /**
+         * AdminSubscriptionResponse
+         * @description One tenant subscription, with the names the operator reads it by.
+         */
+        AdminSubscriptionResponse: {
+            /**
+             * Id
+             * Format: uuid
+             * @description The subscription's id.
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             * @description The organization the subscription's project belongs to.
+             */
+            organization_id: string;
+            /**
+             * Organization Name
+             * @description That organization's name.
+             */
+            organization_name: string;
+            /**
+             * Project Id
+             * Format: uuid
+             * @description The project the subscription is in.
+             */
+            project_id: string;
+            /**
+             * Project Name
+             * @description That project's name.
+             */
+            project_name: string;
+            /**
+             * Customer External Id
+             * @description The tenant's own id for the customer.
+             */
+            customer_external_id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             * @description The plan subscribed to.
+             */
+            plan_id: string;
+            /**
+             * Plan Name
+             * @description That plan's name.
+             */
+            plan_name: string;
+            /**
+             * Status
+             * @description trialing, active, past_due or canceled.
+             */
+            status: string;
+            /**
+             * Trial End Date
+             * @description When the trial ends; null when the subscription has no trial end to move.
+             */
+            trial_end_date: string | null;
+            /**
+             * Environment
+             * @description live or test: which API key prefix wrote it.
+             */
+            environment: string;
+            /**
+             * Current Period Start
+             * Format: date-time
+             * @description When the current billing period began.
+             */
+            current_period_start: string;
+            /**
+             * Current Period End
+             * @description When it ends; null for a period with no end.
+             */
+            current_period_end: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             * @description When the subscription was created.
+             */
+            created_at: string;
+        };
+        /**
+         * AdminUsageBacklogResponse
+         * @description The project's usage events the worker has not processed yet, both environments together.
+         */
+        AdminUsageBacklogResponse: {
+            /**
+             * Unprocessed
+             * @description How many of the project's usage events are waiting to be processed (and charged).
+             */
+            unprocessed: number;
+            /**
+             * Oldest Unprocessed At
+             * @description When the oldest waiting event was recorded (its created_at, not the timestamp the caller sent); null when none waits.
+             */
+            oldest_unprocessed_at: string | null;
+            /**
+             * Stalled
+             * @description Whether the oldest waiting event has waited past the threshold that flags the project as usage_backlog; false when none waits. A few events waiting a moment is the worker working, not a backlog.
+             */
+            stalled: boolean;
+        };
+        /**
+         * AdminUsageEventPage
+         * @description One page of a project's usage events, newest first by when they were recorded; pass `next_cursor` back as `cursor` for the next.
+         */
+        AdminUsageEventPage: {
+            /**
+             * Data
+             * @description The page's rows.
+             */
+            data: components["schemas"]["AdminUsageEventResponse"][];
+            /**
+             * Next Cursor
+             * @description The mark for the page after this one, opaque; null on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /**
+         * AdminUsageEventResponse
+         * @description One usage event a tenant recorded, and what the worker decided to bill for it.
+         */
+        AdminUsageEventResponse: {
+            /**
+             * Id
+             * Format: uuid
+             * @description The event's id.
+             */
+            id: string;
+            /**
+             * Environment
+             * @description live or test: which API key prefix recorded it.
+             */
+            environment: string;
+            /**
+             * Customer External Id
+             * @description The tenant's own id for the customer.
+             */
+            customer_external_id: string;
+            /**
+             * Event Name
+             * @description The event name the tenant sent, which picks the meter.
+             */
+            event_name: string;
+            /**
+             * Value
+             * @description The event's magnitude, as stored; what it counts depends on the meter's aggregation.
+             */
+            value: string;
+            /**
+             * Timestamp
+             * Format: date-time
+             * @description When the tenant says the event happened.
+             */
+            timestamp: string;
+            /**
+             * Created At
+             * Format: date-time
+             * @description When MeterFlow recorded it; the list is newest first by this, the clock the backlog is measured on.
+             */
+            created_at: string;
+            /**
+             * Processed
+             * @description Whether the worker has processed it; until then it is neither charged nor explained.
+             */
+            processed: boolean;
+            /**
+             * Processed At
+             * @description When the worker processed it; null while it waits.
+             */
+            processed_at: string | null;
+            /**
+             * Billing Outcome
+             * @description Why the balance did or did not move: one of charged, no_subscription, no_meter_limit, not_metered, within_allowance, not_deducted, spend_cap_reached, aggregation_not_billable; null while it waits.
+             */
+            billing_outcome: string | null;
         };
         /**
          * AdminUserResponse
@@ -1488,6 +2725,80 @@ export interface components {
             created_at: string;
         };
         /**
+         * AdminWebhookDeliveryPage
+         * @description One page of a project's webhook deliveries, newest first; pass `next_cursor` back as `cursor` for the next.
+         */
+        AdminWebhookDeliveryPage: {
+            /**
+             * Data
+             * @description The page's rows.
+             */
+            data: components["schemas"]["AdminWebhookDeliveryResponse"][];
+            /**
+             * Next Cursor
+             * @description The mark for the page after this one, opaque; null on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /**
+         * AdminWebhookDeliveryResponse
+         * @description One attempt to deliver an event to a tenant's webhook endpoint, and how it ended.
+         */
+        AdminWebhookDeliveryResponse: {
+            /**
+             * Id
+             * Format: uuid
+             * @description The delivery's id.
+             */
+            id: string;
+            /**
+             * Webhook Url
+             * @description The URL of the endpoint it was sent to.
+             */
+            webhook_url: string;
+            /**
+             * Event Type
+             * @description The event sent, e.g. credit.granted.
+             */
+            event_type: string;
+            /**
+             * Environment
+             * @description live or test: the data world the event came from; live when it was not recorded.
+             */
+            environment: string;
+            /**
+             * Status
+             * @description pending, retrying, success or failed.
+             */
+            status: string;
+            /**
+             * Response Code
+             * @description The HTTP status the endpoint answered with; null when it never answered.
+             */
+            response_code: number | null;
+            /**
+             * Attempts
+             * @description How many times it was sent.
+             */
+            attempts: number;
+            /**
+             * Created At
+             * Format: date-time
+             * @description When the delivery was created.
+             */
+            created_at: string;
+            /**
+             * Completed At
+             * @description When it succeeded or failed for good; null while pending.
+             */
+            completed_at: string | null;
+            /**
+             * Request Id
+             * @description The id of the request that caused it, as its log lines carry it; null for a scheduled task's and on older rows.
+             */
+            request_id: string | null;
+        };
+        /**
          * AggregationType
          * @enum {string}
          */
@@ -1505,6 +2816,16 @@ export interface components {
         /** ApiKeyCreateResponse */
         ApiKeyCreateResponse: {
             /**
+             * Created By
+             * @description The user who created it; null for rows older than this field, and once that user is deleted.
+             */
+            created_by: string | null;
+            /**
+             * Created By Email
+             * @description The creator's account email, so a list can name them without a user lookup; null whenever created_by is.
+             */
+            created_by_email: string | null;
+            /**
              * Id
              * Format: uuid
              */
@@ -1531,12 +2852,32 @@ export interface components {
             revoked_at: string | null;
             /** Last Used At */
             last_used_at: string | null;
+            /**
+             * Expires At
+             * @description When the key stops authenticating: null for a key that never expires; the dashboard-session key expires DASHBOARD_SESSION_KEY_TTL_HOURS after it is minted.
+             */
+            expires_at: string | null;
+            /**
+             * Read Only
+             * @description True for a key that can only read; only a viewer's dashboard-session key is one, and every SDK write refuses it.
+             */
+            read_only: boolean;
             /** Raw Key */
             raw_key: string;
         };
         /** ApiKeyResponse */
         ApiKeyResponse: {
             /**
+             * Created By
+             * @description The user who created it; null for rows older than this field, and once that user is deleted.
+             */
+            created_by: string | null;
+            /**
+             * Created By Email
+             * @description The creator's account email, so a list can name them without a user lookup; null whenever created_by is.
+             */
+            created_by_email: string | null;
+            /**
              * Id
              * Format: uuid
              */
@@ -1563,6 +2904,16 @@ export interface components {
             revoked_at: string | null;
             /** Last Used At */
             last_used_at: string | null;
+            /**
+             * Expires At
+             * @description When the key stops authenticating: null for a key that never expires; the dashboard-session key expires DASHBOARD_SESSION_KEY_TTL_HOURS after it is minted.
+             */
+            expires_at: string | null;
+            /**
+             * Read Only
+             * @description True for a key that can only read; only a viewer's dashboard-session key is one, and every SDK write refuses it.
+             */
+            read_only: boolean;
         };
         /**
          * BillingConfigResponse
@@ -1616,6 +2967,12 @@ export interface components {
             /** Cancel Effective At */
             cancel_effective_at?: string | null;
         };
+        /**
+         * BillingStatus
+         * @description Org billing lifecycle — provider-agnostic (Paddle ids live in their own columns).
+         * @enum {string}
+         */
+        BillingStatus: "none" | "trialing" | "active" | "past_due" | "canceled";
         /** Body_uploadAvatar */
         Body_uploadAvatar: {
             /**
@@ -1695,6 +3052,22 @@ export interface components {
             };
         };
         /**
+         * ConnectorEventPage
+         * @description One page of a connector's delivery log, newest first; pass `next_cursor` back as `cursor` for the next.
+         */
+        ConnectorEventPage: {
+            /**
+             * Data
+             * @description The page's rows.
+             */
+            data: components["schemas"]["ConnectorEventResponse"][];
+            /**
+             * Next Cursor
+             * @description The mark for the page after this one, opaque; null on the last page.
+             */
+            next_cursor?: string | null;
+        };
+        /**
          * ConnectorEventResponse
          * @description One row of a connector's delivery log.
          *
@@ -1745,6 +3118,16 @@ export interface components {
          *     characters, enough to tell two secrets apart.
          */
         ConnectorResponse: {
+            /**
+             * Created By
+             * @description The user who created it; null for rows older than this field, and once that user is deleted.
+             */
+            created_by: string | null;
+            /**
+             * Created By Email
+             * @description The creator's account email, so a list can name them without a user lookup; null whenever created_by is.
+             */
+            created_by_email: string | null;
             /**
              * Id
              * Format: uuid
@@ -1846,6 +3229,11 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            /**
+             * Usage Draws Credits
+             * @description Whether recorded usage can take credits from this balance: true when the customer's plan charges usage beyond its allowance, false when only credits.deduct moves it, null without an active or trialing subscription.
+             */
+            usage_draws_credits: boolean | null;
         };
         /** CreditDeductRequest */
         CreditDeductRequest: {
@@ -2125,6 +3513,89 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /**
+         * InvitationCreateResponse
+         * @description The invitation just sent; the same fields for any address.
+         */
+        InvitationCreateResponse: {
+            /**
+             * Id
+             * Format: uuid
+             * @description The invitation's id, which the revoke endpoint takes.
+             */
+            id: string;
+            /**
+             * Email
+             * Format: email
+             * @description The address invited; only an account with this email can accept.
+             */
+            email: string;
+            /**
+             * Role
+             * @description admin, member or viewer: the role the invitee gets on accepting.
+             */
+            role: string;
+            /**
+             * Invited By
+             * @description The user who sent the invitation; null when that account was deleted.
+             */
+            invited_by: string | null;
+            /**
+             * Invited By Email
+             * @description The inviter's account email, so a list can name them; null whenever invited_by is.
+             */
+            invited_by_email: string | null;
+            /**
+             * Expires At
+             * Format: date-time
+             * @description When the emailed link stops working, 7 days after it was sent.
+             */
+            expires_at: string;
+            /**
+             * Invitation Token
+             * @description The raw token, returned only when the API runs in DEBUG so the flow is testable without an inbox.
+             */
+            invitation_token?: string | null;
+        };
+        /**
+         * InvitationResponse
+         * @description A pending invitation to join an organization.
+         */
+        InvitationResponse: {
+            /**
+             * Id
+             * Format: uuid
+             * @description The invitation's id, which the revoke endpoint takes.
+             */
+            id: string;
+            /**
+             * Email
+             * Format: email
+             * @description The address invited; only an account with this email can accept.
+             */
+            email: string;
+            /**
+             * Role
+             * @description admin, member or viewer: the role the invitee gets on accepting.
+             */
+            role: string;
+            /**
+             * Invited By
+             * @description The user who sent the invitation; null when that account was deleted.
+             */
+            invited_by: string | null;
+            /**
+             * Invited By Email
+             * @description The inviter's account email, so a list can name them; null whenever invited_by is.
+             */
+            invited_by_email: string | null;
+            /**
+             * Expires At
+             * Format: date-time
+             * @description When the emailed link stops working, 7 days after it was sent.
+             */
+            expires_at: string;
+        };
         /** InviteMemberRequest */
         InviteMemberRequest: {
             /**
@@ -2154,6 +3625,18 @@ export interface components {
             /** Password */
             password: string;
         };
+        /**
+         * MemberRoleUpdateRequest
+         * @description A member's new role; `owner` is never grantable here, as it is never invitable.
+         */
+        MemberRoleUpdateRequest: {
+            /**
+             * Role
+             * @description admin, member or viewer: the role the member has from now on.
+             * @enum {string}
+             */
+            role: "admin" | "member" | "viewer";
+        };
         /** MessageResponse */
         MessageResponse: {
             /** Message */
@@ -2176,7 +3659,10 @@ export interface components {
             event_name: string;
             /** @default count */
             aggregation_type?: components["schemas"]["AggregationType"];
-            /** Aggregation Field */
+            /**
+             * Aggregation Field
+             * @description The event property the meter reads: required for sum, max, min and unique_count, refused on count.
+             */
             aggregation_field?: string | null;
             /**
              * Filter Conditions
@@ -2198,6 +3684,16 @@ export interface components {
         };
         /** MeterResponse */
         MeterResponse: {
+            /**
+             * Created By
+             * @description The user who created it; null for rows older than this field, and once that user is deleted.
+             */
+            created_by: string | null;
+            /**
+             * Created By Email
+             * @description The creator's account email, so a list can name them without a user lookup; null whenever created_by is.
+             */
+            created_by_email: string | null;
             /**
              * Id
              * Format: uuid
@@ -2259,13 +3755,34 @@ export interface components {
             /**
              * User Id
              * Format: uuid
+             * @description The member's user id.
              */
             user_id: string;
-            /** Role */
+            /**
+             * Email
+             * Format: email
+             * @description The member's own account email.
+             */
+            email: string;
+            /**
+             * Role
+             * @description owner, admin, member or viewer.
+             */
             role: string;
+            /**
+             * Invited By
+             * @description The user who invited this member; null for the owner who created the organization, or when the inviter's account was deleted.
+             */
+            invited_by: string | null;
+            /**
+             * Invited By Email
+             * @description The inviter's account email, so a list can name them; null whenever invited_by is.
+             */
+            invited_by_email: string | null;
             /**
              * Joined At
              * Format: date-time
+             * @description When the membership was created.
              */
             joined_at: string;
         };
@@ -2359,6 +3876,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Role
+             * @description The signed-in user's role in this organization: owner, admin, member or viewer.
+             */
+            role: string;
         };
         /** OrganizationUpdateRequest */
         OrganizationUpdateRequest: {
@@ -2493,6 +4015,16 @@ export interface components {
         };
         /** PlanResponse */
         PlanResponse: {
+            /**
+             * Created By
+             * @description The user who created it; null for rows older than this field, and once that user is deleted.
+             */
+            created_by: string | null;
+            /**
+             * Created By Email
+             * @description The creator's account email, so a list can name them without a user lookup; null whenever created_by is.
+             */
+            created_by_email: string | null;
             /**
              * Id
              * Format: uuid
@@ -2714,6 +4246,11 @@ export interface components {
             total_credits_deducted: string;
         };
         /**
+         * PlatformTier
+         * @enum {string}
+         */
+        PlatformTier: "drip" | "flow" | "stream" | "torrent";
+        /**
          * PortalBranding
          * @description How one project's portal page looks to its end customers.
          *
@@ -2897,6 +4434,16 @@ export interface components {
         /** ProjectResponse */
         ProjectResponse: {
             /**
+             * Created By
+             * @description The user who created it; null for rows older than this field, and once that user is deleted.
+             */
+            created_by: string | null;
+            /**
+             * Created By Email
+             * @description The creator's account email, so a list can name them without a user lookup; null whenever created_by is.
+             */
+            created_by_email: string | null;
+            /**
              * Id
              * Format: uuid
              */
@@ -2984,6 +4531,8 @@ export interface components {
             organization_name?: string | null;
             /** Accepted Terms */
             accepted_terms: boolean;
+            /** Invitation Token */
+            invitation_token?: string | null;
         };
         /** RevenueAnalyticsResponse */
         RevenueAnalyticsResponse: {
@@ -3351,6 +4900,8 @@ export interface components {
             event_name: string;
             /** Aggregation Type */
             aggregation_type: string;
+            /** Aggregation Field */
+            aggregation_field: string | null;
             /** Value */
             value: string;
             /** Event Count */
@@ -3494,6 +5045,16 @@ export interface components {
          */
         WebhookCreateResponse: {
             /**
+             * Created By
+             * @description The user who created it; null for rows older than this field, and once that user is deleted.
+             */
+            created_by: string | null;
+            /**
+             * Created By Email
+             * @description The creator's account email, so a list can name them without a user lookup; null whenever created_by is.
+             */
+            created_by_email: string | null;
+            /**
              * Id
              * Format: uuid
              */
@@ -3532,6 +5093,22 @@ export interface components {
             /** Secret */
             secret: string;
         };
+        /**
+         * WebhookDeliveryPage
+         * @description One page of an endpoint's delivery attempts, newest first; pass `next_cursor` back as `cursor` for the next.
+         */
+        WebhookDeliveryPage: {
+            /**
+             * Data
+             * @description The page's rows.
+             */
+            data: components["schemas"]["WebhookDeliveryResponse"][];
+            /**
+             * Next Cursor
+             * @description The mark for the page after this one, opaque; null on the last page.
+             */
+            next_cursor?: string | null;
+        };
         /** WebhookDeliveryResponse */
         WebhookDeliveryResponse: {
             /**
@@ -3558,8 +5135,6 @@ export interface components {
             response_body: string | null;
             /** Attempts */
             attempts: number;
-            /** Next Retry At */
-            next_retry_at: string | null;
             /**
              * Created At
              * Format: date-time
@@ -3573,6 +5148,16 @@ export interface components {
          * @description Returned on all reads — secret is never included.
          */
         WebhookResponse: {
+            /**
+             * Created By
+             * @description The user who created it; null for rows older than this field, and once that user is deleted.
+             */
+            created_by: string | null;
+            /**
+             * Created By Email
+             * @description The creator's account email, so a list can name them without a user lookup; null whenever created_by is.
+             */
+            created_by_email: string | null;
             /**
              * Id
              * Format: uuid
@@ -4057,6 +5642,39 @@ export interface operations {
             };
         };
     };
+    acceptInvitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptInvitationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgMemberResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list: {
         parameters: {
             query?: never;
@@ -4207,6 +5825,37 @@ export interface operations {
             };
         };
     };
+    listMembers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgMemberResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     invite: {
         parameters: {
             query?: never;
@@ -4228,8 +5877,135 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "application/json": components["schemas"]["InvitationCreateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    removeMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    changeMemberRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberRoleUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "application/json": components["schemas"]["OrgMemberResponse"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listInvitations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revokeInvitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+                invitation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -5043,6 +6819,10 @@ export interface operations {
         parameters: {
             query?: {
                 customer_id?: string | null;
+                /** @description Only subscriptions in one of these statuses; repeat it for several. Paged after the match. */
+                status?: components["schemas"]["SubscriptionStatus"][] | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
                 /** @description Rows per page */
                 limit?: number;
                 /** @description `next_cursor` from the previous page; omit for the first */
@@ -5676,6 +7456,42 @@ export interface operations {
             };
         };
     };
+    listDeliveryPage: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+            };
+            header?: never;
+            path: {
+                webhook_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebhookDeliveryPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     usage: {
         parameters: {
             query: {
@@ -5839,7 +7655,16 @@ export interface operations {
     };
     admin_list_organizations: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -5855,11 +7680,29 @@ export interface operations {
                     "application/json": components["schemas"]["AdminOrganizationResponse"][];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
     admin_list_projects: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -5875,11 +7718,29 @@ export interface operations {
                     "application/json": components["schemas"]["AdminProjectResponse"][];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
     admin_list_users: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -5893,6 +7754,780 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminUserResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_flagged_accounts: {
+        parameters: {
+            query?: {
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminFlaggedAccountResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_subscriptions: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSubscriptionPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_billing_events: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminBillingEventPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_connector_events: {
+        parameters: {
+            query?: {
+                /** @description Only events the receiver gave this status. */
+                status?: ("processed" | "ignored") | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminConnectorEventPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_get_project: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProjectDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_project_webhook_deliveries: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminWebhookDeliveryPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_project_customers: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCustomerPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_project_usage_events: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUsageEventPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_project_api_keys: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiKeyResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_list_audit_log: {
+        parameters: {
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_set_organization_tier: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminSetTierRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_set_organization_billing_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminSetBillingStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_adjust_credits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminAdjustCreditsRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_extend_trial: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                subscription_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminExtendTrialRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_verify_user_email: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_send_password_reset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_reactivate_user: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_reactivate_project: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_revoke_api_key: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_disable_webhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                webhook_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_disable_connector: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connector_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAuditLogResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -6255,6 +8890,8 @@ export interface operations {
             query: {
                 project_id: string;
                 environment?: string;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
                 /** @description Rows per page */
                 limit?: number;
                 /** @description `next_cursor` from the previous page; omit for the first */
@@ -6617,7 +9254,10 @@ export interface operations {
     listEvents: {
         parameters: {
             query?: {
+                /** @description Rows per page */
                 limit?: number;
+                /** @description `next_cursor` from the previous page; omit for the first */
+                cursor?: string | null;
             };
             header?: never;
             path: {
@@ -6633,7 +9273,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ConnectorEventResponse"][];
+                    "application/json": components["schemas"]["ConnectorEventPage"];
                 };
             };
             /** @description Validation Error */

@@ -1,4 +1,4 @@
-import type { MeterFlowOptions, RequestOptions } from "../client";
+import type { MeterFlowOptions, QueryValue, RequestOptions } from "../client";
 import { version as PACKAGE_VERSION } from "../../package.json";
 import {
   MeterFlowError,
@@ -19,12 +19,17 @@ import { retryable } from "./retry";
 // before and had been reporting 0.2.0 for two releases.
 const SDK_VERSION: string = PACKAGE_VERSION;
 
-function buildUrl(baseUrl: string, path: string, query?: Record<string, string | number | boolean>): string {
+/**
+ * The request URL: the path under the base URL, with the query appended.
+ * baseUrl: the API root the client was made with.
+ * path: the endpoint, relative to it.
+ * query: the parameters; an `undefined` or `null` one is left out, a list repeats its key once per item.
+ */
+function buildUrl(baseUrl: string, path: string, query?: Record<string, QueryValue>): string {
   const url = new URL(path, baseUrl.endsWith("/") ? baseUrl : baseUrl + "/");
-  if (query) {
-    for (const [key, value] of Object.entries(query)) {
-      url.searchParams.set(key, String(value));
-    }
+  for (const [key, value] of Object.entries(query ?? {})) {
+    if (value === undefined || value === null) continue;
+    for (const item of Array.isArray(value) ? value : [value]) url.searchParams.append(key, String(item));
   }
   return url.toString();
 }

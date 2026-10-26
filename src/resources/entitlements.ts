@@ -23,7 +23,7 @@ export interface CheckOptions {
 export class EntitlementsResource {
   constructor(private readonly client: MeterFlow) {}
 
-  /** Every feature on the customer's plan, with this period's usage. Empty `entitlements` without a subscription. */
+  /** Every feature on the customer's plan, with this period's usage; a metered row answers for the next unit, as `check()` would. Empty without a subscription. */
   get(customerId: string): Promise<EntitlementsResponse> {
     return this.client.request<EntitlementsResponse>("GET", `entitlements/${encodeURIComponent(customerId)}`);
   }

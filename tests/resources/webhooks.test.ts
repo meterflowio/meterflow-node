@@ -37,7 +37,6 @@ const DELIVERY_RESPONSE = {
   response_code: 200,
   response_body: "ok",
   attempts: 1,
-  next_retry_at: null,
   created_at: "2026-01-01T00:00:00Z",
   completed_at: "2026-01-01T00:00:01Z",
 };
@@ -114,5 +113,36 @@ describe("webhooks.deliveries", () => {
       ),
     );
     await expect(makeClient().webhooks.deliveries("someone-elses")).rejects.toBeInstanceOf(NotFoundError);
+  });
+});
+
+describe("webhooks.deliveryPage", () => {
+  it("GET /webhooks/:id/deliveries/page returns a page and passes limit and cursor", async () => {
+    let capturedUrl = "";
+    server.use(
+      http.get(`${BASE}/webhooks/wh-1/deliveries/page`, ({ request }) => {
+        capturedUrl = request.url;
+        return HttpResponse.json({ data: [DELIVERY_RESPONSE], next_cursor: "Y3Vyc29y" });
+      }),
+    );
+    const page = await makeClient().webhooks.deliveryPage("wh-1", { limit: 25, cursor: "abc" });
+    expect(page.data[0]?.event_type).toBe("usage.recorded");
+    expect(page.next_cursor).toBe("Y3Vyc29y");
+    const params = new URL(capturedUrl).searchParams;
+    expect(params.get("limit")).toBe("25");
+    expect(params.get("cursor")).toBe("abc");
+  });
+
+  it("asks for the first page with no query string, and a null cursor is left out", async () => {
+    const urls: string[] = [];
+    server.use(
+      http.get(`${BASE}/webhooks/wh-1/deliveries/page`, ({ request }) => {
+        urls.push(request.url);
+        return HttpResponse.json({ data: [], next_cursor: null });
+      }),
+    );
+    await makeClient().webhooks.deliveryPage("wh-1");
+    await makeClient().webhooks.deliveryPage("wh-1", { cursor: null });
+    expect(urls.map((url) => new URL(url).search)).toEqual(["", ""]);
   });
 });
