@@ -717,6 +717,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/credits/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hold credits for a customer until confirmed, released or expired */
+        post: operations["reserve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/credits/reservations/{reservation_id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Take some or all of a held reservation from the balance, freeing the rest */
+        post: operations["confirmReservation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/credits/reservations/{reservation_id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Free a held reservation with nothing taken */
+        post: operations["releaseReservation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/credits/reservations/{reservation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a credit reservation */
+        get: operations["getReservation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/usage/events": {
         parameters: {
             query?: never;
@@ -1872,6 +1940,26 @@ export interface paths {
         };
         /** What this link's customer has recorded, per meter */
         get: operations["portalUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/export/{dataset}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download one of a project's tables, in one environment, as CSV or JSON Lines
+         * @description Streams every row of the table for the project and environment, oldest first (`created_at`, then `id`), as an attachment named `<project-slug>-<dataset>-<environment>-<YYYYMMDD>.<csv|jsonl>`. Owners and admins of the project's organization only. `csv` has a header row; `json` is JSON Lines (`application/x-ndjson`): one object per line, so the file streams and can be read a line at a time. Every row is written as the API's own response for it: ids and decimals as strings, timestamps ISO-8601 UTC; in CSV a null is an empty cell, a boolean `true` / `false`, and `metadata` / `properties` a JSON string. Columns, in order — `usage_events`: id, project_id, environment, meter_id, customer_external_id, event_name, value, properties, idempotency_key, processed, billing_outcome, processed_at, timestamp, created_at; `credit_transactions`: id, project_id, environment, customer_external_id, transaction_type, amount, balance_before, balance_after, description, idempotency_key, metadata, created_at; `subscriptions`: id, project_id, environment, plan_id, customer_external_id, status, current_period_start, current_period_end, trial_end_date, spend_cap, topup_amount, max_topups_per_window, idempotency_key, canceled_at, metadata, created_at, updated_at; `credit_reservations`: id, project_id, environment, customer_external_id, amount, status, expires_at, description, metadata, idempotency_key, confirmed_amount, transaction_id, created_at, settled_at.
+         */
+        get: operations["exportProjectData"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3416,6 +3504,16 @@ export interface components {
              */
             updated_at: string;
             /**
+             * Reserved
+             * @description Credits held by reservations that are neither settled nor expired; they stay in `balance` until confirmed.
+             */
+            reserved: string;
+            /**
+             * Available
+             * @description What the customer can spend: `balance` less `reserved`; deducts, usage charges and new holds are measured against it.
+             */
+            available: string;
+            /**
              * Usage Draws Credits
              * @description Whether recorded usage can take credits from this balance: true when the customer's plan charges usage beyond its allowance, false when only credits.deduct moves it, null without an active or trialing subscription.
              */
@@ -3456,6 +3554,107 @@ export interface components {
             metadata?: {
                 [key: string]: unknown;
             };
+        };
+        /**
+         * CreditReservationConfirmRequest
+         * @description Settle a hold: take some or all of it from the balance, and free the rest.
+         */
+        CreditReservationConfirmRequest: {
+            /**
+             * Amount
+             * @description The credits to take, at most the amount held; the whole hold when left out. What is not taken is freed.
+             */
+            amount?: number | string | null;
+        };
+        /**
+         * CreditReservationRequest
+         * @description Hold part of a customer's balance for a while, so other spending cannot take it first.
+         */
+        CreditReservationRequest: {
+            /** Customer External Id */
+            customer_external_id: string;
+            /**
+             * Amount
+             * @description The credits to hold; refused with 402 when the customer's available credits are fewer.
+             */
+            amount: number | string;
+            /**
+             * Ttl Seconds
+             * @description How long the hold lasts, in seconds (1 to 86,400); past it the hold is expired and its credits are free again.
+             * @default 300
+             */
+            ttl_seconds?: number;
+            /** Description */
+            description?: string | null;
+            /** Idempotency Key */
+            idempotency_key?: string | null;
+            /**
+             * Metadata
+             * @default {}
+             */
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * CreditReservationResponse
+         * @description A hold on part of a customer's balance, and how it ended.
+         */
+        CreditReservationResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Environment */
+            environment: string;
+            /** Customer External Id */
+            customer_external_id: string;
+            /**
+             * Amount
+             * @description The credits held.
+             */
+            amount: string;
+            /** @description held: still counted in `reserved`; confirmed: `confirmed_amount` was taken from the balance; released: freed with nothing taken; expired: held past `expires_at`, freed with nothing taken and no longer confirmable. */
+            status: components["schemas"]["ReservationStatus"];
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Description */
+            description: string | null;
+            /** Metadata */
+            metadata_: {
+                [key: string]: unknown;
+            };
+            /** Idempotency Key */
+            idempotency_key: string | null;
+            /**
+             * Confirmed Amount
+             * @description What the confirm took from the balance; null unless status is confirmed.
+             */
+            confirmed_amount: string | null;
+            /**
+             * Transaction Id
+             * @description The ledger row the confirm wrote; null unless status is confirmed.
+             */
+            transaction_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Settled At
+             * @description When it was confirmed or released; null while held and for an expired hold.
+             */
+            settled_at: string | null;
         };
         /**
          * CreditTransactionPage
@@ -3689,6 +3888,18 @@ export interface components {
              */
             purchased_at: string;
         };
+        /**
+         * ExportDataset
+         * @description The tables a project can export.
+         * @enum {string}
+         */
+        ExportDataset: "usage_events" | "credit_transactions" | "subscriptions" | "credit_reservations";
+        /**
+         * ExportFormat
+         * @description The file an export is written as: CSV with a header row, or JSON Lines (one object per line).
+         * @enum {string}
+         */
+        ExportFormat: "csv" | "json";
         /**
          * FeatureType
          * @enum {string}
@@ -4757,6 +4968,12 @@ export interface components {
             /** Invitation Token */
             invitation_token?: string | null;
         };
+        /**
+         * ReservationStatus
+         * @description The stored states of a credit hold; `expired` is never stored, it is a `held` row past its `expires_at`.
+         * @enum {string}
+         */
+        ReservationStatus: "held" | "confirmed" | "released" | "expired";
         /** RevenueAnalyticsResponse */
         RevenueAnalyticsResponse: {
             /**
@@ -7349,6 +7566,139 @@ export interface operations {
             };
         };
     };
+    reserve: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Idempotency key for safe retries; equivalent to the body's idempotency_key field (the body wins when both are sent). */
+                "Idempotency-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreditReservationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditReservationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirmReservation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CreditReservationConfirmRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditReservationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    releaseReservation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditReservationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    getReservation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reservation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditReservationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     record: {
         parameters: {
             query?: never;
@@ -9770,6 +10120,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsageSummaryResponse"];
+                };
+            };
+        };
+    };
+    exportProjectData: {
+        parameters: {
+            query: {
+                environment: "live" | "test";
+                format?: components["schemas"]["ExportFormat"];
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                dataset: components["schemas"]["ExportDataset"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The file. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                    "application/x-ndjson": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { MeterFlow } from "../../src/client";
-import { AuthError, InsufficientCreditsError, NotFoundError, RateLimitError, ServerError, ValidationError } from "../../src/errors";
+import { AuthError, ConflictError, InsufficientCreditsError, NotFoundError, RateLimitError, ServerError, ValidationError } from "../../src/errors";
 
 const BASE = "https://api.meter-flow.com/api/v1";
 const API_KEY = "mf_test_abc123";
@@ -203,6 +203,108 @@ describe("credits.transactions", () => {
     await makeClient().credits.transactions("cust@1");
     expect(capturedUrl).toContain("cust%401");
     expect(new URL(capturedUrl).search).toBe("");
+  });
+});
+
+const HOLD = {
+  id: "res-1",
+  project_id: "proj-1",
+  environment: "test",
+  customer_external_id: "cust-1",
+  amount: "30.000000",
+  status: "held",
+  expires_at: "2026-01-01T00:05:00Z",
+  description: null,
+  metadata_: {},
+  idempotency_key: null,
+  confirmed_amount: null,
+  transaction_id: null,
+  created_at: "2026-01-01T00:00:00Z",
+  settled_at: null,
+};
+
+describe("credits.reserve", () => {
+  it("POST /credits/reservations with the body and idempotency key, returns the hold", async () => {
+    let capturedBody: unknown;
+    let capturedKey: string | null = null;
+    server.use(
+      http.post(`${BASE}/credits/reservations`, async ({ request }) => {
+        capturedBody = await request.json();
+        capturedKey = request.headers.get("Idempotency-Key");
+        return HttpResponse.json(HOLD, { status: 201 });
+      }),
+    );
+
+    const hold = await makeClient().credits.reserve({ customer_external_id: "cust-1", amount: 30, ttl_seconds: 600 }, { idempotencyKey: "job-7" });
+
+    expect(capturedBody).toEqual({ customer_external_id: "cust-1", amount: 30, ttl_seconds: 600 });
+    expect(capturedKey).toBe("job-7");
+    expect(hold.status).toBe("held");
+  });
+
+  it("maps 402 to InsufficientCreditsError", async () => {
+    server.use(http.post(`${BASE}/credits/reservations`, () => HttpResponse.json({ error: { code: 402, message: "Insufficient credit balance" } }, { status: 402 })));
+    await expect(makeClient().credits.reserve({ customer_external_id: "c", amount: 1 })).rejects.toBeInstanceOf(InsufficientCreditsError);
+  });
+});
+
+describe("credits.confirmReservation", () => {
+  it("POST …/confirm with the amount, returns the settled hold", async () => {
+    let capturedBody: unknown;
+    let capturedUrl = "";
+    server.use(
+      http.post(`${BASE}/credits/reservations/:id/confirm`, async ({ request }) => {
+        capturedUrl = request.url;
+        capturedBody = await request.json();
+        return HttpResponse.json({ ...HOLD, status: "confirmed", confirmed_amount: "12.000000", transaction_id: "tx-9" });
+      }),
+    );
+
+    const hold = await makeClient().credits.confirmReservation("res/1", { amount: 12 });
+
+    expect(capturedUrl).toBe(`${BASE}/credits/reservations/res%2F1/confirm`);
+    expect(capturedBody).toEqual({ amount: 12 });
+    expect(hold.transaction_id).toBe("tx-9");
+  });
+
+  it("sends an empty body to confirm the whole hold", async () => {
+    let capturedBody: unknown;
+    server.use(
+      http.post(`${BASE}/credits/reservations/res-1/confirm`, async ({ request }) => {
+        capturedBody = await request.json();
+        return HttpResponse.json({ ...HOLD, status: "confirmed" });
+      }),
+    );
+    await makeClient().credits.confirmReservation("res-1");
+    expect(capturedBody).toEqual({});
+  });
+
+  it("maps 409 (no longer held) to ConflictError", async () => {
+    server.use(
+      http.post(`${BASE}/credits/reservations/res-1/confirm`, () =>
+        HttpResponse.json({ error: { code: 409, message: "Reservation is expired; only a held reservation can be confirmed" } }, { status: 409 }),
+      ),
+    );
+    await expect(makeClient().credits.confirmReservation("res-1")).rejects.toBeInstanceOf(ConflictError);
+  });
+});
+
+describe("credits.releaseReservation", () => {
+  it("POST …/release, returns the hold", async () => {
+    server.use(http.post(`${BASE}/credits/reservations/res-1/release`, () => HttpResponse.json({ ...HOLD, status: "released" })));
+    expect((await makeClient().credits.releaseReservation("res-1")).status).toBe("released");
+  });
+});
+
+describe("credits.reservation", () => {
+  it("GET /credits/reservations/{id}", async () => {
+    server.use(http.get(`${BASE}/credits/reservations/res-1`, () => HttpResponse.json({ ...HOLD, status: "expired" })));
+    expect((await makeClient().credits.reservation("res-1")).status).toBe("expired");
+  });
+
+  it("maps 404 to NotFoundError", async () => {
+    server.use(http.get(`${BASE}/credits/reservations/nope`, () => HttpResponse.json({ error: { code: 404, message: "Reservation not found" } }, { status: 404 })));
+    await expect(makeClient().credits.reservation("nope")).rejects.toBeInstanceOf(NotFoundError);
   });
 });
 

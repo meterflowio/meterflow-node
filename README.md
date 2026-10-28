@@ -24,6 +24,7 @@ Track what your customers use, enforce credit balances, and manage subscriptions
 - [Configuration](#configuration)
 - [Usage guide](#usage-guide)
   - [Credits](#credits)
+  - [Holding credits for a long job](#holding-credits-for-a-long-job)
   - [Usage events](#usage-events)
   - [Subscriptions](#subscriptions)
   - [Plans](#plans)
@@ -155,7 +156,7 @@ const txn = await client.credits.grant({
 console.log(txn.balance_after); // "5000.000000"
 ```
 
-**Deduct** — remove credits. Throws `InsufficientCreditsError` (HTTP 402) if the balance can't cover it — the customer is never taken below zero:
+**Deduct** — remove credits. Throws `InsufficientCreditsError` (HTTP 402) if the available credits can't cover it (the balance less what [holds](#holding-credits-for-a-long-job) keep) — the customer is never taken below zero:
 
 ```typescript
 import { InsufficientCreditsError } from "meterflow";
@@ -183,6 +184,8 @@ const bal = await client.credits.balance("customer_123");
 bal.balance;        // "3545.000000"  ← decimal string, see note below
 bal.total_granted;  // "5250.000000"
 bal.total_consumed; // "1705.000000"
+bal.reserved;       // "200.000000"   ← held by reservations, still in balance
+bal.available;      // "3345.000000"  ← balance − reserved: what can be spent now
 bal.usage_draws_credits; // true | false | null
 ```
 
@@ -209,6 +212,30 @@ do {
 > not read anything out of it. `limit` is 1–200 and defaults to 50.
 
 > **Amounts are decimal strings.** Balances and amounts come back as strings (`"3545.000000"`) to avoid floating-point drift on money-like values. Parse deliberately (`Number(...)` or a decimal library) when you need arithmetic.
+
+### Holding credits for a long job
+
+A job that runs for minutes — a render, an agent run — should not find, at the end, that other spending took the credits it was counting on. **Reserve** them first: the balance stays where it is, but `available` drops, and every other spend (`credits.deduct()`, usage charged by a metered plan, a `check()` that would charge, another hold) is measured against `available`.
+
+```typescript
+const hold = await client.credits.reserve(
+  { customer_external_id: "customer_123", amount: 200, ttl_seconds: 600, description: "render #42" },
+  { idempotencyKey: "render-42" },
+);
+
+try {
+  const used = await render();                                              // the long job
+  await client.credits.confirmReservation(hold.id, { amount: used.credits }); // take what it used; the rest is freed
+} catch (err) {
+  await client.credits.releaseReservation(hold.id);                         // nothing taken
+  throw err;
+}
+```
+
+- **Reserve** throws `InsufficientCreditsError` (402) when `available` cannot cover the amount, and `ConflictError` (409) when held credits would pass the subscription's spend cap: a hold counts against the cap as it will when confirmed. `ttl_seconds` defaults to 300 and is at most 86,400 (a day).
+- **Confirm** writes one ordinary `deduct` to the ledger, with your hold's description and `metadata.reservation_id`, and fires the same webhooks a deduct does. Leave out `amount` to take the whole hold; more than the hold is a `ValidationError` (422). Whatever it does not take is freed.
+- **Release** frees the hold with nothing taken. A hold left alone expires at `expires_at` and frees itself: `reservation(id)` then answers `status: "expired"`, a confirm throws `ConflictError` (409), and a release answers it as expired.
+- Confirming or releasing a hold that is already confirmed or released throws `ConflictError` (409). If a retry of a confirm meets a 409, `client.credits.reservation(hold.id)` tells you whether the first attempt landed.
 
 ### Usage events
 
@@ -424,7 +451,7 @@ Prefer to be told rather than to ask? Subscribe a webhook to `limit.reached` (se
 
 A MeterFlow blip should never take your product down with it. Three things keep `check()` answering:
 
-- **The cache.** Answers from `check()` and `get()` are reused for the `max-age` the API sends (15 s), per client, up to 1,000 of them. A response without `Cache-Control` is never cached. A successful `usage.record()`, `usage.recordBatch()`, `credits.grant()` or `credits.deduct()` makes that customer's answers stale, so the next `check()` asks again. `entitlementsCache: false` turns the cache off.
+- **The cache.** Answers from `check()` and `get()` are reused for the `max-age` the API sends (15 s), per client, up to 1,000 of them. A response without `Cache-Control` is never cached. A successful `usage.record()`, `usage.recordBatch()`, `credits.grant()`, `credits.deduct()`, `credits.reserve()`, `confirmReservation()` or `releaseReservation()` makes that customer's answers stale, so the next `check()` asks again. `entitlementsCache: false` turns the cache off.
 - **The last answer.** When the API cannot be reached — a network error, a timeout, a 5xx or a 429, once the retries are spent — a call answers its last answer for that customer and feature, past its age, marked `stale: true`.
 - **Your defaults.** With no earlier answer, `check()` answers your `entitlementDefaults` entry for the feature, else its `"*"` entry: `{ feature, feature_type: null, allowed, reason: "offline_default" }`. With neither, it throws as before. `get()` has no default: a whole plan cannot be guessed.
 

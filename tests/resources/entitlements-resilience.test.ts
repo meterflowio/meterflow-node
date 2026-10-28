@@ -164,12 +164,16 @@ describe("the entitlements cache", () => {
       ["usage.recordBatch", `${BASE}/usage/events/batch`, (client) => client.usage.recordBatch([{ event_name: "images.generated", customer_external_id: "cust_1" }])],
       ["credits.grant", `${BASE}/credits/grant`, (client) => client.credits.grant({ customer_external_id: "cust_1", amount: 10, metadata: {} })],
       ["credits.deduct", `${BASE}/credits/deduct`, (client) => client.credits.deduct({ customer_external_id: "cust_1", amount: 10, metadata: {} })],
+      ["credits.reserve", `${BASE}/credits/reservations`, (client) => client.credits.reserve({ customer_external_id: "cust_1", amount: 10 })],
+      ["credits.confirmReservation", `${BASE}/credits/reservations/res-1/confirm`, (client) => client.credits.confirmReservation("res-1")],
+      ["credits.releaseReservation", `${BASE}/credits/reservations/res-1/release`, (client) => client.credits.releaseReservation("res-1")],
     ];
     for (const [name, url, write] of writes) {
       it(name, async () => {
         const seen = answer(CHECK, ALLOWED);
         const other = answer(`${BASE}/entitlements/cust_2/check`, ALLOWED);
-        server.use(http.post(url, () => HttpResponse.json({}, { status: 201 })));
+        // Confirm and release learn the customer from the hold they answer with.
+        server.use(http.post(url, () => HttpResponse.json({ customer_external_id: "cust_1" }, { status: 201 })));
         const client = makeClient();
         await client.entitlements.check("cust_1", "images.generated");
         await client.entitlements.check("cust_2", "images.generated");
