@@ -946,8 +946,42 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Platform-wide stats */
+        /** Totals for the whole platform, or for one tenant */
         get: operations["admin_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The platform's own machinery: database, Redis, Celery queues, usage backlog, log search */
+        get: operations["admin_platform_health"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search the logs shipped to Grafana Loki, narrowed to a tenant by the ids on each line */
+        get: operations["admin_search_logs"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2263,6 +2297,22 @@ export interface components {
             environment: string;
         };
         /**
+         * AdminDependencyCheck
+         * @description Whether one dependency answered a round trip, and how fast.
+         */
+        AdminDependencyCheck: {
+            /**
+             * Ok
+             * @description Whether it answered.
+             */
+            ok: boolean;
+            /**
+             * Latency Ms
+             * @description How long the round trip took, in milliseconds; null when it did not answer.
+             */
+            latency_ms: number | null;
+        };
+        /**
          * AdminExtendTrialRequest
          * @description Push a trialing subscription's trial end further out.
          */
@@ -2326,6 +2376,93 @@ export interface components {
             request_id: string | null;
         };
         /**
+         * AdminLogLine
+         * @description One log line, newest first in its search, with the fields an operator reads it by lifted out of the JSON.
+         */
+        AdminLogLine: {
+            /**
+             * Timestamp
+             * Format: date-time
+             * @description When the line was written.
+             */
+            timestamp: string;
+            /**
+             * Service
+             * @description The service that wrote it (the stream's service label).
+             */
+            service: string | null;
+            /**
+             * Level
+             * @description Its level, lower-cased; null for a line that is not JSON.
+             */
+            level: string | null;
+            /**
+             * Message
+             * @description The line's message; the raw line when it is not JSON or has no message.
+             */
+            message: string;
+            /**
+             * Request Id
+             * @description The request the line was written for, when it names one.
+             */
+            request_id: string | null;
+            /**
+             * Organization Id
+             * @description The organization the line was written for, when it names one.
+             */
+            organization_id: string | null;
+            /**
+             * Project Id
+             * @description The project the line was written for, when it names one.
+             */
+            project_id: string | null;
+            /**
+             * Fields
+             * @description Every other field on the JSON line (logger, exception, extras); empty for a plain line.
+             */
+            fields: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * AdminLogSearchResponse
+         * @description One log search: the lines, and the query and window that found them, so the same search opens in Grafana.
+         */
+        AdminLogSearchResponse: {
+            /**
+             * Search Available
+             * @description Whether this API could search: false until its LOKI_* keys are set, and lines is then empty.
+             */
+            search_available: boolean;
+            /**
+             * Query
+             * @description The LogQL query the search ran, or would run; null when the scope matches nothing.
+             */
+            query: string | null;
+            /**
+             * Start
+             * Format: date-time
+             * @description The window's start.
+             */
+            start: string;
+            /**
+             * End
+             * Format: date-time
+             * @description The window's end.
+             */
+            end: string;
+            /**
+             * Lines
+             * @description The lines found, newest first, at most the limit asked for.
+             */
+            lines: components["schemas"]["AdminLogLine"][];
+            /**
+             * Limit Reached
+             * @description Whether the search stopped at the limit: older lines in the window were not read.
+             */
+            limit_reached: boolean;
+        };
+        /**
          * AdminOrganizationResponse
          * @description Organization plus rollup counts — one row per org across the whole platform.
          */
@@ -2370,6 +2507,39 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * AdminPlatformHealthResponse
+         * @description How the platform's own machinery is doing right now, for every tenant at once: it is never narrowed.
+         */
+        AdminPlatformHealthResponse: {
+            /** @description The Postgres round trip. */
+            database: components["schemas"]["AdminDependencyCheck"];
+            /** @description The Redis round trip; Redis is the rate limiter's store and Celery's broker. */
+            redis: components["schemas"]["AdminDependencyCheck"];
+            /**
+             * Queues
+             * @description The Celery queues and what waits in each; empty when Redis did not answer.
+             */
+            queues: components["schemas"]["AdminQueueDepth"][];
+            /**
+             * Reserved Tasks
+             * @description Tasks a worker has taken and not finished, retries waiting for their time among them; null when Redis did not answer.
+             */
+            reserved_tasks: number | null;
+            /** @description Usage events on the whole platform the worker has not processed yet. */
+            usage_backlog: components["schemas"]["AdminUsageBacklogResponse"];
+            /**
+             * Log Search Available
+             * @description Whether this API can search the logs (GET /admin/logs); false until its LOKI_* keys are set.
+             */
+            log_search_available: boolean;
+            /**
+             * Checked At
+             * Format: date-time
+             * @description When these were measured.
+             */
+            checked_at: string;
         };
         /**
          * AdminPriceMappingResponse
@@ -2470,6 +2640,22 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * AdminQueueDepth
+         * @description One Celery queue on the broker.
+         */
+        AdminQueueDepth: {
+            /**
+             * Name
+             * @description The queue's name.
+             */
+            name: string;
+            /**
+             * Waiting
+             * @description Tasks waiting in it for a worker to take them.
+             */
+            waiting: number;
         };
         /**
          * AdminSetBillingStatusRequest
@@ -4223,26 +4409,63 @@ export interface components {
         };
         /**
          * PlatformStatsResponse
-         * @description Platform-wide totals for the super-admin overview.
+         * @description Totals for the console's overview strip: the whole platform, or the tenant the console is narrowed to.
          */
         PlatformStatsResponse: {
-            /** Total Users */
+            /**
+             * Total Users
+             * @description Users in the scope: every user, or the members of the scope's organizations.
+             */
             total_users: number;
-            /** Total Organizations */
+            /**
+             * Total Organizations
+             * @description Organizations in the scope.
+             */
             total_organizations: number;
-            /** Total Projects */
+            /**
+             * Total Projects
+             * @description Projects in the scope, active or not.
+             */
             total_projects: number;
-            /** Active Projects */
+            /**
+             * Active Projects
+             * @description Of those, the ones that are active.
+             */
             active_projects: number;
-            /** Total Subscriptions */
+            /**
+             * Total Subscriptions
+             * @description Tenant subscriptions in the scope, in any status and both environments.
+             */
             total_subscriptions: number;
-            /** Active Subscriptions */
+            /**
+             * Active Subscriptions
+             * @description Of those, the ones whose status is active.
+             */
             active_subscriptions: number;
-            /** Total Usage Events */
+            /**
+             * Total Usage Events
+             * @description Usage events recorded in the scope, both environments.
+             */
             total_usage_events: number;
-            /** Total Credits Granted */
+            /**
+             * Live Usage Events
+             * @description Of those, the ones recorded with a live key.
+             */
+            live_usage_events: number;
+            /**
+             * Test Usage Events
+             * @description Of those, the ones recorded with a test key: counted against the test allowance only, and deleted after 30 days.
+             */
+            test_usage_events: number;
+            /**
+             * Total Credits Granted
+             * @description Credits granted in the scope, both environments.
+             */
             total_credits_granted: string;
-            /** Total Credits Deducted */
+            /**
+             * Total Credits Deducted
+             * @description Credits deducted in the scope, both environments.
+             */
             total_credits_deducted: string;
         };
         /**
@@ -7635,7 +7858,14 @@ export interface operations {
     };
     admin_stats: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -7649,6 +7879,85 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlatformStatsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_platform_health: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminPlatformHealthResponse"];
+                };
+            };
+        };
+    };
+    admin_search_logs: {
+        parameters: {
+            query?: {
+                /** @description The services to read; the API and worker of this API's own stack when empty. */
+                services?: ("api" | "celery-worker" | "celery-beat" | "caddy" | "api-staging" | "worker-staging" | "beat-staging")[];
+                /** @description The levels to keep; every level when empty. */
+                levels?: ("debug" | "info" | "warning" | "error" | "critical")[];
+                /** @description Only the lines of this request. */
+                request_id?: string | null;
+                /** @description The window's start; an hour before its end when left out. */
+                start?: string | null;
+                /** @description The window's end; now when left out. */
+                end?: string | null;
+                /** @description The most lines to return, newest first. */
+                limit?: number;
+                /** @description Narrow to this user: the organizations they belong to, and everything under them. */
+                user_id?: string | null;
+                /** @description Narrow to this organization; with user_id, one the user is a member of. */
+                organization_id?: string | null;
+                /** @description Narrow to this project; with organization_id, one of its projects. */
+                project_id?: string | null;
+                /** @description Only rows whose searched text contains this, ignoring case; % and _ are matched literally. Paged after the match. */
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLogSearchResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

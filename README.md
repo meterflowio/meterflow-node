@@ -127,6 +127,9 @@ const client = new MeterFlow({
   timeout: 30_000,                              // optional — per-request timeout in ms (default 30 s)
   retries: 3,                                   // optional — automatic retries (default 3, 0 disables)
   fetch: customFetch,                           // optional — inject your own fetch (tests, proxies)
+  entitlementsCache: true,                      // optional — reuse entitlement answers for their max-age (default on)
+  entitlementDefaults: { "*": "deny" },         // optional — what check() answers while MeterFlow is unreachable
+  onError: (error, context) => {},              // optional — told when an entitlements call answers from a fallback
 });
 ```
 
@@ -404,7 +407,7 @@ await client.usage.record({ event_name: "images.generated", customer_external_id
 - A **soft** limit answers `allowed: true` with `reason: "soft_limit_exceeded"` — let it through, nudge the upgrade.
 - A **metered** limit stays allowed while the customer's credits cover the overage; otherwise `insufficient_credits`.
 - `allowed: false` is a normal resolved answer, never an exception. A feature key the project does not know at all is a `NotFoundError` — that is a typo, not a plan.
-- The answer carries `Cache-Control: private, max-age=15`; on hot paths cache it per customer for a few seconds rather than calling on every request.
+- The SDK reuses an answer for the `Cache-Control: max-age` it came with (15 s today), per customer, feature and `quantity` — `allowed: false` included. See [When MeterFlow can't be reached](#when-meterflow-cant-be-reached).
 
 **All of them at once** — for a settings or pricing screen:
 
@@ -416,6 +419,26 @@ const { entitlements, period_end } = await client.entitlements.get("customer_123
 Each metered row answers for the **next** unit, exactly as `check()` would, so its `allowed` and `reason` match the gate. Reading the list fires no webhook; only `check()` announces `balance.exhausted`.
 
 Prefer to be told rather than to ask? Subscribe a webhook to `limit.reached` (see below).
+
+#### When MeterFlow can't be reached
+
+A MeterFlow blip should never take your product down with it. Three things keep `check()` answering:
+
+- **The cache.** Answers from `check()` and `get()` are reused for the `max-age` the API sends (15 s), per client, up to 1,000 of them. A response without `Cache-Control` is never cached. A successful `usage.record()`, `usage.recordBatch()`, `credits.grant()` or `credits.deduct()` makes that customer's answers stale, so the next `check()` asks again. `entitlementsCache: false` turns the cache off.
+- **The last answer.** When the API cannot be reached — a network error, a timeout, a 5xx or a 429, once the retries are spent — a call answers its last answer for that customer and feature, past its age, marked `stale: true`.
+- **Your defaults.** With no earlier answer, `check()` answers your `entitlementDefaults` entry for the feature, else its `"*"` entry: `{ feature, feature_type: null, allowed, reason: "offline_default" }`. With neither, it throws as before. `get()` has no default: a whole plan cannot be guessed.
+
+```typescript
+const client = new MeterFlow({
+  apiKey: process.env.METERFLOW_API_KEY!,
+  timeout: 2_000,                  // a gate on your hot path should give up fast
+  retries: 1,
+  entitlementDefaults: { "images.generated": "allow", "*": "deny" },
+  onError: (error, { customerId, feature, fallback }) => log.warn("meterflow fallback", { customerId, feature, fallback, error }),
+});
+```
+
+A 401, 403, 404 or 422 is an answer, not an outage: it is thrown, never replaced by a fallback. `onError` is called before a fallback is used; anything it throws is ignored. `check()` resolves to an `EntitlementCheck` and `get()` to an `EntitlementList` (both exported types): the API's types, widened for `stale` and `offline_default`.
 
 ### The balance portal — a page you don't have to build
 

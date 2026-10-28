@@ -28,24 +28,27 @@ export const MAX_BATCH_EVENTS = 500;
 export class UsageResource {
   constructor(private readonly client: MeterFlow) {}
 
-  record(body: UsageEventRequest, opts?: RecordOptions): Promise<UsageEventResponse> {
-    return this.client.request<UsageEventResponse>("POST", "usage/events", {
+  /** Record one usage event; the customer's cached entitlement answers go stale once it lands. */
+  async record(body: UsageEventRequest, opts?: RecordOptions): Promise<UsageEventResponse> {
+    const result = await this.client.request<UsageEventResponse>("POST", "usage/events", {
       body,
       ...(opts?.idempotencyKey !== undefined && { idempotencyKey: opts.idempotencyKey }),
     });
+    this.client.entitlementCache?.invalidate(body.customer_external_id);
+    return result;
   }
 
-  /** Record up to `MAX_BATCH_EVENTS` events in one request. Larger arrays are rejected locally, never sent. */
-  recordBatch(events: UsageEventRequest[], opts?: RecordOptions): Promise<UsageEventResponse[]> {
+  /** Record up to `MAX_BATCH_EVENTS` events in one request. Larger arrays are rejected locally, never sent. Each customer's cached entitlement answers go stale once it lands. */
+  async recordBatch(events: UsageEventRequest[], opts?: RecordOptions): Promise<UsageEventResponse[]> {
     if (events.length > MAX_BATCH_EVENTS) {
-      return Promise.reject(
-        new PayloadTooLargeError(`A batch may contain at most ${MAX_BATCH_EVENTS} events; this one has ${events.length}. Split it.`),
-      );
+      throw new PayloadTooLargeError(`A batch may contain at most ${MAX_BATCH_EVENTS} events; this one has ${events.length}. Split it.`);
     }
-    return this.client.request<UsageEventResponse[]>("POST", "usage/events/batch", {
+    const result = await this.client.request<UsageEventResponse[]>("POST", "usage/events/batch", {
       body: { events },
       ...(opts?.idempotencyKey !== undefined && { idempotencyKey: opts.idempotencyKey }),
     });
+    for (const customerId of new Set(events.map((event) => event.customer_external_id))) this.client.entitlementCache?.invalidate(customerId);
+    return result;
   }
 
   /**

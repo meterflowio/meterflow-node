@@ -124,6 +124,7 @@ export async function httpRequest<T>(
         const parsed = await parseErrorBody(response);
         throw mapResponseError(response.status, parsed, requestId, response);
       }
+      opts?.onHeaders?.(response.headers);
 
       if (response.status === 204 || response.headers.get("content-length") === "0") {
         return undefined as T;

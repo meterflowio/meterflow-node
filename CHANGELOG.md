@@ -3,7 +3,44 @@
 Notable changes to `meterflow` (npm). Dates are the day the version was cut; what is published is
 in [the project roadmap](https://github.com/Donovantxy/MeterFlow/blob/main/docs/ROADMAP.md#where-we-are-2026-10-07).
 
-## Unreleased
+## 0.10.0 — 2026-10-28
+
+**`entitlements.check()` and `get()` cache their answers and keep answering through an outage.**
+Nothing to change to benefit; three options to tune it:
+- Answers are reused for the `Cache-Control: max-age` the API sends (15 s), per customer, feature and
+  `quantity`, `allowed: false` included, up to 1,000 per client. A successful `usage.record()`,
+  `recordBatch()`, `credits.grant()` or `deduct()` makes that customer's answers stale, so a
+  check right after a record asks again. **If you relied on two checks in a row both reaching the API,
+  pass `entitlementsCache: false`.**
+- When MeterFlow cannot be reached (network error, timeout, 5xx or 429 after the retries), a call
+  answers its last answer, marked `stale: true`. With none, `check()` answers your
+  `entitlementDefaults` entry for the feature, or its `"*"` entry, as
+  `{ feature, feature_type: null, allowed, reason: "offline_default" }`. With neither, it throws as
+  before. A 401, 403, 404 or 422 is always thrown.
+- `onError(error, { customerId, feature, fallback })` is called before a fallback is used.
+- Types: `check()` now resolves to `EntitlementCheck` and `get()` to `EntitlementList` (both exported),
+  the API's types plus `stale`, with `reason` also allowing `"offline_default"` and `feature_type`
+  allowing `null`. Code that assigns `gate.feature_type` or `gate.reason` to the narrower generated
+  type needs a check for those values first. `MeterFlowOptions` is now exported too.
+
+**A test key (`mf_test_*`) now has its own monthly event allowance, a tenth of your plan's.** Until
+now test events were never refused. From this release `usage.record()` and `usage.recordBatch()` on a
+test key throw `AuthError` (status 403, *Plan limit reached: … test usage events per month*) once the
+organization's test events this month pass 10 % of the plan's live allowance plus the usual 10 %
+grace: 5,500 on Drip, 22,000 on Flow, 77,000 on Stream, 440,000 on Torrent. Test events never count
+toward the live quota, event packs raise only the live one, and no warning email is sent for test.
+Live keys are unchanged.
+
+**A test key is rate-limited at 60 requests a minute; a live key stays at 300.** Past it the SDK's
+`RateLimitError` (429, retried after `Retry-After`) arrives sooner on a test key. If your test suite
+fires more than 60 calls a minute, pace it or batch with `usage.recordBatch()`.
+
+**Test data expires.** Test usage events are deleted after 30 days, and a test subscription with no
+usage event for 90 days is deleted with its test credit balance and ledger. Live usage events are
+kept for your plan's analytics retention (45, 90, 180 or 365 days) and then deleted. Nothing in the
+SDK's calls changes; a `subscriptions.list()` on a test key simply stops returning an expired one.
+
+## 0.9.0 — 2026-10-26
 
 **`webhooks.deliveryPage(webhookId, { limit, cursor })` reads an endpoint's receipts past the newest 100.**
 It answers `{ data, next_cursor }` like `subscriptions.list()`: newest first, scoped to your key's

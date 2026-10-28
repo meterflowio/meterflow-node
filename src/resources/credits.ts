@@ -25,18 +25,24 @@ export interface PageQuery {
 export class CreditsResource {
   constructor(private readonly client: MeterFlow) {}
 
-  grant(body: CreditGrantRequest, opts?: GrantOptions): Promise<CreditTransactionResponse> {
-    return this.client.request<CreditTransactionResponse>("POST", "credits/grant", {
+  /** Add credits to a customer's balance; their cached entitlement answers go stale once it lands. */
+  async grant(body: CreditGrantRequest, opts?: GrantOptions): Promise<CreditTransactionResponse> {
+    const result = await this.client.request<CreditTransactionResponse>("POST", "credits/grant", {
       body,
       ...(opts?.idempotencyKey !== undefined && { idempotencyKey: opts.idempotencyKey }),
     });
+    this.client.entitlementCache?.invalidate(body.customer_external_id);
+    return result;
   }
 
-  deduct(body: CreditDeductRequest, opts?: DeductOptions): Promise<CreditTransactionResponse> {
-    return this.client.request<CreditTransactionResponse>("POST", "credits/deduct", {
+  /** Take credits from a customer's balance; their cached entitlement answers go stale once it lands. */
+  async deduct(body: CreditDeductRequest, opts?: DeductOptions): Promise<CreditTransactionResponse> {
+    const result = await this.client.request<CreditTransactionResponse>("POST", "credits/deduct", {
       body,
       ...(opts?.idempotencyKey !== undefined && { idempotencyKey: opts.idempotencyKey }),
     });
+    this.client.entitlementCache?.invalidate(body.customer_external_id);
+    return result;
   }
 
   balance(customerId: string): Promise<CreditBalanceResponse> {

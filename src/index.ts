@@ -1,4 +1,5 @@
-export { MeterFlow } from "./client";
+export { MeterFlow, type MeterFlowOptions, type EntitlementDefault, type EntitlementFallbackContext } from "./client";
+export type { EntitlementCheck, EntitlementList } from "./resources/entitlements";
 // Note: verifyWebhook is intentionally NOT re-exported here — it depends on
 // Node's `crypto` and would break browser bundles. Import it from
 // "meterflow/webhook" instead (server-side only).

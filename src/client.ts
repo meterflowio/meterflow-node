@@ -6,6 +6,19 @@ import { PlansResource } from "./resources/plans";
 import { PortalResource } from "./resources/portal";
 import { EntitlementsResource } from "./resources/entitlements";
 import { WebhooksResource } from "./resources/webhooks";
+import { EntitlementCache } from "./utils/entitlement-cache";
+
+/** What `entitlements.check()` answers for a feature while MeterFlow cannot be reached and no earlier answer is cached. */
+export type EntitlementDefault = "allow" | "deny";
+
+/** Which call fell back, and to what, as `onError` is told. */
+export interface EntitlementFallbackContext {
+  customerId: string;
+  /** The feature checked; null for `entitlements.get()`. */
+  feature: string | null;
+  /** `stale`: the last answer, past its `max-age`. `default`: the configured `entitlementDefaults` entry. */
+  fallback: "stale" | "default";
+}
 
 export interface MeterFlowOptions {
   apiKey: string;
@@ -13,6 +26,12 @@ export interface MeterFlowOptions {
   timeout?: number;
   retries?: number;
   fetch?: typeof globalThis.fetch;
+  /** Reuse `entitlements.check()` / `get()` answers for the `max-age` the API sends (15 s today). On by default. */
+  entitlementsCache?: boolean;
+  /** Per feature, what `check()` answers while MeterFlow is unreachable and nothing is cached; `"*"` covers every other feature. */
+  entitlementDefaults?: Record<string, EntitlementDefault>;
+  /** Called before an entitlements call answers from a fallback, with the error that caused it. What it throws is ignored. */
+  onError?: (error: unknown, context: EntitlementFallbackContext) => void;
 }
 
 /** One query parameter's value: a list is sent as the key repeated once per item; `undefined` and `null` are not sent. */
@@ -23,6 +42,8 @@ export interface RequestOptions {
   query?: Record<string, QueryValue>;
   idempotencyKey?: string;
   timeout?: number;
+  /** @internal — given a successful response's headers; how the entitlements cache reads `Cache-Control`. */
+  onHeaders?: (headers: Headers) => void;
 }
 
 export class MeterFlow {
@@ -35,6 +56,8 @@ export class MeterFlow {
   private _portal?: PortalResource;
   private _entitlements?: EntitlementsResource;
   private _webhooks?: WebhooksResource;
+  /** @internal — the entitlement answers this client has read; null when `entitlementsCache` is false. */
+  readonly entitlementCache: EntitlementCache | null;
 
   constructor(options: MeterFlowOptions) {
     if (!options.apiKey.startsWith("mf_live_") && !options.apiKey.startsWith("mf_test_")) {
@@ -48,7 +71,11 @@ export class MeterFlow {
       // Bind to globalThis: browsers throw "Illegal invocation" if window.fetch is
       // called detached from window (Node tolerates it, so this only bites in the browser).
       fetch: options.fetch ?? globalThis.fetch.bind(globalThis),
+      entitlementsCache: options.entitlementsCache ?? true,
+      entitlementDefaults: options.entitlementDefaults ?? {},
+      onError: options.onError ?? ((): void => undefined),
     };
+    this.entitlementCache = this.options.entitlementsCache ? new EntitlementCache() : null;
   }
 
   get portal(): PortalResource {
